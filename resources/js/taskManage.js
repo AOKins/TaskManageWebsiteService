@@ -32,10 +32,13 @@ function clickHandler(event) {
     var item = event.target;
     // Iterate up the tree to determine if a check button was selected
     while (item) {
-        if (item.nodeName == "BUTTON" && /check/.test(item.className)) {
-            handleCheck(event);
-            break;
+        if (item.nodeName == "BUTTON") {
+            if (/check/.test(item.className)) {
+                handleCheck(event);
+                break;    
+            }
         }
+        // Nothing identified, iterate up a node
         item = item.parentNode;
     }
 }
