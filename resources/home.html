@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+    <meta charset="utf-8">
+    <head>
+        <title>Home</title>
+        <link href="css/task_style.css" type="text/css" rel="stylesheet" />
+        <script src="js/taskManage.js" defer></script>
+    </head>
+    <body>
+        <!--Side navigation bar-->
+        <nav>
+            <img id="logo" src="images/logo.png">
+            <ul>
+                <li><a href="home.html" class="active">Home</a></li>
+                <li><a href="calendar.html">Calendar</a></li>
+                <li><a href="agenda.html">Agenda</a></li>
+                <li><a href="settings.html">Settings</a></li>
+            </ul>
+        </nav>
+
+        <!--Button for task options/prefrences-->
+        <input id="filter" type="image" src="images/test.png"/>
+
+        <!-- The task objects are to be dynamically added into this div, for css setup there may be hard-coded examples-->
+        <div id="main_list">
+            <div class="task" id="1">
+                <button label="check" class="check"></button>
+                <div id="title">
+                    Take out garbage
+                </div>
+                <div id="time">
+                    12:30am
+                </div>
+                <div id="description">
+                </div>
+            </div>
+            <div class="task">
+                <button label="check"></button>
+                <div id="title">
+                    Feed dog
+                </div>
+                <div id="time">
+                    6:30am
+                </div>
+                <div id="description">
+                    anxiety meds and 2 scoops of chow
+                </div>
+            </div>
+            <div class="shared task">
+                <button label="check"></button>
+                <div id="title">
+                    Feed dog
+                </div>
+                <div id="time">
+                    6:30am
+                </div>
+                <div id="description">
+                    anxiety meds and 2 scoops of chow
+                </div>
+            </div>
+            <div class="task">
+                <button label="check"></button>
+                <div id="title">
+                    Feed dog
+                </div>
+                <div id="time">
+                    6:30am
+                </div>
+                <div id="description">
+                    anxiety meds and 2 scoops of chow
+                </div>
+            </div>
+            <div class="task">
+                <button label="check"></button>
+                <div id="title">
+                    Feed dog
+                </div>
+                <div id="time">
+                    6:30am
+                </div>
+                <div id="description">
+                    anxiety meds and 2 scoops of chow
+                </div>
+            </div>
+            <div class="task">
+                <button label="check"></button>
+                <div id="title">
+                    Feed dog
+                </div>
+                <div id="time">
+                    6:30am
+                </div>
+                <div id="description">
+                    anxiety meds and 2 scoops of chow
+                </div>
+            </div>
+        </div>
+
+        <!-- Div to contain the object that will be for displaying/managing the creation of new tasks-->
+        <div id="createTask">
+            
+        </div>
+    </body>
+</html>

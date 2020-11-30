@@ -1,0 +1,58 @@
+body {
+    /*Ensures enough padding on left to prevent overlap with nav bar*/
+    padding-left: 180px;
+    font-family: Tahoma, arial;
+    display: inline-block;
+}
+
+nav {
+    position: fixed;
+    width: 180px;
+    height: 100%;
+    background-color: grey;
+    color: white;
+    top: 0;
+    left: 0;
+    z-index: 10;
+}
+
+nav #logo {
+    width: 50%;
+    padding-left: 25%;
+    padding-right: 25%;
+    padding-top: 5%;
+}
+
+nav ul {
+    list-style-type: none;
+    margin: 0;
+    font-family: Tahoma, arial;
+    font-size: 200%;
+    padding-left: 0;
+}
+
+nav ul li {
+    margin-top: 10%;
+    border-color: grey;
+    
+}
+
+nav ul li a {
+    display: block;
+    padding-left: 15%;
+    padding-top: 5%;
+    padding-bottom: 5%;
+    width: 85%;
+    text-decoration: none;
+    color: white;
+
+}
+
+.active {
+    background-color: lightgreen
+}
+
+nav ul li a:hover {
+    background-color: green;
+}
+
