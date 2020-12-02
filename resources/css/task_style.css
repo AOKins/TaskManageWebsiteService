@@ -79,3 +79,7 @@ input#filter {
     text-align: center;
     top: 50px;
 }
+
+.task.false {
+    background-color: grey;
+}

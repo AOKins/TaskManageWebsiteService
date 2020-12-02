@@ -1,4 +1,5 @@
 
+import 'dart:core';
 import 'dart:io';
 import 'mime.dart'; // Mime type map object is defined in seperate file
 import 'dart:convert' show utf8; // For converting POST requests body content into a more usable format
@@ -13,7 +14,7 @@ List<int> fileContentsBytes(String filePath) {
   }
   catch(e) {
     print(e);
-    return null;
+    return [];
   }
 }
 
@@ -45,8 +46,8 @@ bool verifyLoginCred(String givenUser, String givenPass) {
 // Takes in an inputted body and converts into a map
 // '&' seperates pairs, '=' for (key,value)
 Map<String,String> convertBody(String input) {
-  List<int> ampIndexes = new List<int>();  // List to store the indexes where the & are
-  List<int> equIndexes = new List<int>();  // List to store the indexes where the = are
+  List<int> ampIndexes = [];  // List to store the indexes where the & are
+  List<int> equIndexes = [];  // List to store the indexes where the = are
   Map<String, String> result = new Map<String,String>();
 
   ampIndexes.add(-1); // Adding -1 as index for first ampersand (start of first assignment)
@@ -61,8 +62,8 @@ Map<String,String> convertBody(String input) {
 
   String left, right;
   for (int i = 0; i < equIndexes.length; i++) {
-    left = input.substring(ampIndexes[i-1]+1, equIndexes[i]);
-    right = input.substring(equIndexes[i]+1, ampIndexes[i]);
+    left = input.substring(ampIndexes[i]+1, equIndexes[i]);
+    right = input.substring(equIndexes[i]+1, ampIndexes[i+1]);
     
     result[left] = right;
   }
@@ -79,7 +80,7 @@ void handleGet(HttpRequest request, bool loginThruPost) async {
   bool verified = loginThruPost;
   // Determine if they are logged in by checking the cookies
   if (request.headers["Cookie"] != null) {
-    verified = verifyCookieAccess(request.headers["Cookie"]);
+    verified = verifyCookieAccess(request.headers["Cookie"] as List<String>);
   }
   // If accessing the default directory, set to home page by default
   if ((filePath == "/" && verified) || (filePath == "/login.html" && verified)) {
@@ -94,16 +95,12 @@ void handleGet(HttpRequest request, bool loginThruPost) async {
   // Get file format and add content-type header using MIME type
   String fileFormat = filePath.substring(filePath.lastIndexOf(".")+1);
 
-  request.response.headers.add("content-type", mimeTypesMap[fileFormat]);
+  request.response.headers.add("content-type", mimeTypesMap[fileFormat] as String);
   // Write response and close, ending conversation
   var bodyContent = fileContentsBytes(filePath);
   // If the content is null, then the resource was not found
-  if (bodyContent == null) {
-    request.response.statusCode = 404;
-  }
-  else {
-    request.response.add(bodyContent);
-  }
+    
+  request.response.add(bodyContent);
   await request.response.close();
 }
 
@@ -116,7 +113,7 @@ void handlePost(HttpRequest request) async {
   bool loggedIn = false;
   if (bodyMap["submission"] == "login") {
     // Verify login
-    if (verifyLoginCred(bodyMap["username"], bodyMap["password"])) {
+    if (verifyLoginCred(bodyMap["username"] as String, bodyMap["password"] as String)) {
       // Currently bad implementation of cookie, needs to use database/encryption or something to make much more secure and also identifiable for a specific account
       request.response.headers.add("Set-Cookie", "validcookie");
       loggedIn = true;
@@ -129,11 +126,13 @@ void handlePost(HttpRequest request) async {
 //Helpful resource to developing initial understanding of HttpServer on Dart and approach to its implementation https://dart.dev/tutorials/server/httpserver
 void main() async {
   // Create server object with local address and port 80
-  var server = await HttpServer.bind(InternetAddress.loopbackIPv4 ,80);
+  var server = await HttpServer.bind(InternetAddress.loopbackIPv4, 80);
+  print("Opening the following: " + server.address.address.toString());
 
   // Wait for requests in the server object, handling the requests
   await for (HttpRequest request in server) {
     // Requests handled in appriopriate function
+    print(request.method + " " + request.requestedUri.toString());
     switch (request.method) {
       case 'GET':
         handleGet(request, false);
