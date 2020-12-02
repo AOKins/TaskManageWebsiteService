@@ -1,74 +1,8 @@
-
 import 'dart:core';
 import 'dart:io';
 import 'mime.dart'; // Mime type map object is defined in seperate file
+import 'helpfulFuncs.dart';
 import 'dart:convert' show utf8; // For converting POST requests body content into a more usable format
-
-// Takes the path and returns the binary result
-// Input: filePath - string to where the file is
-// Output: returns the file contents as bytes, null if error occurs (outputs error to terminal)
-List<int> fileContentsBytes(String filePath) {
-  try {
-    var resourceFile = new File(filePath);
-    return resourceFile.readAsBytesSync();
-  }
-  catch(e) {
-    print(e);
-    return [];
-  }
-}
-
-// Method to determine if a client is in possession of a valid cookie
-// Currently not valid means implemented, currently verifies by just checking for cookies in general
-// Input: List of strings containing all the cookies from the client
-// Output: true if one of the cookies is valid
-bool verifyCookieAccess(List<String> cookies) {
-  for (int i = 0; i < cookies.length; i++) {
-    // Like verifyLoginCred, this is a hard coded bad method that needs to be replaced with usage of the database
-    if (cookies[i] == "validcookie") {
-      return true;
-    }
-  }
-  return false;
-}
-
-// Method to determine if a user attempting to login has the correct username and password
-// Currently not valid implementation, needs communication with the database or appriopriate portal to work as intended feature
-bool verifyLoginCred(String givenUser, String givenPass) {
-  print(givenUser + "  " + givenPass);
-  // At the moment, this is the only valid login credentials and is hardcoded (the project needs to have this method replaced with communication with the Database server)
-  if (givenUser == "admin" && givenPass == "password") {
-    return true;
-  }
-  return false;
-}
-
-// Takes in an inputted body and converts into a map
-// '&' seperates pairs, '=' for (key,value)
-Map<String,String> convertBody(String input) {
-  List<int> ampIndexes = [];  // List to store the indexes where the & are
-  List<int> equIndexes = [];  // List to store the indexes where the = are
-  Map<String, String> result = new Map<String,String>();
-
-  ampIndexes.add(-1); // Adding -1 as index for first ampersand (start of first assignment)
-  for (int i = 0; i < input.length; i++) {
-    if (input[i] == '&') {
-      ampIndexes.add(i);
-    } else if (input[i] == '=') {
-      equIndexes.add(i);
-    }
-  }
-  ampIndexes.add(input.length);  // Adding length (just out of range of end of string) as last ampersand
-
-  String left, right;
-  for (int i = 0; i < equIndexes.length; i++) {
-    left = input.substring(ampIndexes[i]+1, equIndexes[i]);
-    right = input.substring(equIndexes[i]+1, ampIndexes[i+1]);
-    
-    result[left] = right;
-  }
-  return result;
-}
 
 // Handles the getting of resources for a client (GET requests or resources for POST request)
 // Input: HttpRequest request - to get and send info with client
@@ -101,7 +35,7 @@ void handleGet(HttpRequest request, bool loginThruPost) async {
   // If the content is null, then the resource was not found
     
   request.response.add(bodyContent);
-  await request.response.close();
+  request.response.close();
 }
 
 // Functiont to handle when the client is making a POST request (which atm is only when logging in)
@@ -111,6 +45,7 @@ void handlePost(HttpRequest request) async {
   // Get body of Post message from request as a map
   Map<String,String> bodyMap = convertBody(await utf8.decodeStream(request));
   bool loggedIn = false;
+  print(bodyMap.toString());
   if (bodyMap["submission"] == "login") {
     // Verify login
     if (verifyLoginCred(bodyMap["username"] as String, bodyMap["password"] as String)) {
@@ -118,9 +53,15 @@ void handlePost(HttpRequest request) async {
       request.response.headers.add("Set-Cookie", "validcookie");
       loggedIn = true;
     }
+    // Have handleGet perform the resulting body content for home.html
+    handleGet(request, loggedIn);
   }
-  // Have handleGet perform the resulting body content
-  handleGet(request, loggedIn);
+  else if (bodyMap["submission"] == "today.json") {
+    updateData(bodyMap);
+  }
+
+  request.response.add([]);
+  request.response.close();
 }
 
 //Helpful resource to developing initial understanding of HttpServer on Dart and approach to its implementation https://dart.dev/tutorials/server/httpserver

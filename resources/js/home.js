@@ -1,7 +1,5 @@
 // Here is where for both main/home and agenda pages should have their task manage related loading functions placed
 
-// Determine which page we are loading (home or agenda)
-var fileName = location.pathname.substring(location.pathname.lastIndexOf("/")+1);
 
 function appendTask(listStart, task) {
     var taskContainer = document.createElement("DIV");
@@ -43,19 +41,16 @@ function outputTasks(content) {
     
 }
 
-
 // Script function called when the html page has loaded, handles loading the page content
 async function loadContent()  {
-    if (fileName == "home.html") {
-        let data = await fetch(location.protocol + "//" + location.host + ":80" + '/test_data/today.json');
-        if (!data.ok) {
-            alert("Could not establish connection to server");
-        }
-        else {
-            data.text().then((content) => outputTasks(content));
-        }
-    
+    let data = await fetch(location.protocol + "//" + location.host + ":80" + '/test_data/today.json');
+    if (!data.ok) {
+        alert("Could not establish connection to server");
     }
+    else {
+        data.text().then((content) => outputTasks(content));
+    }
+    
     return 1;
 }
 
@@ -65,10 +60,15 @@ async function loadContent()  {
 
 function buttonHandler(id) {
     var this_task = document.getElementById(id);
-    if (this_task.classList.contains("true")) {
+    var task_checked = this_task.classList.contains("true");
+    if (task_checked) {
         this_task.setAttribute("class", "task false");
     }
     else {
         this_task.setAttribute("class", "task true");    
     }
+    var myRequest = new XMLHttpRequest();
+    myRequest.open("POST", "home.html", true);
+    myRequest.setRequestHeader("Content-type", "text/plain");
+    myRequest.send("submission=today.json&task_id=" + id + "&checked=" + task_checked);
 }
