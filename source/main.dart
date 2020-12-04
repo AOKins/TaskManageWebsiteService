@@ -29,11 +29,12 @@ void handleGet(HttpRequest request, bool loginThruPost) async {
   // Get file format and add content-type header using MIME type
   String fileFormat = filePath.substring(filePath.lastIndexOf(".")+1);
 
-  request.response.headers.add("content-type", mimeTypesMap[fileFormat] as String);
+  request.response.headers.add("content-type", mimeTypesMap[fileFormat] ?? "application/octet-stream");
   // Write response and close, ending conversation
   var bodyContent = fileContentsBytes(filePath);
   // If the content is null, then the resource was not found
-    
+
+  request.response.statusCode = (bodyContent != []) ? 200 : 404;
   request.response.add(bodyContent);
   request.response.close();
 }
@@ -56,10 +57,12 @@ void handlePost(HttpRequest request) async {
     // Have handleGet perform the resulting body content for home.html
     handleGet(request, loggedIn);
   }
-  else if (bodyMap["submission"] == "today.json") {
+  else if (bodyMap["submission"] == "updateTask") {
     updateData(bodyMap);
   }
-
+  else if (bodyMap["submission"] == "createTask") {
+    print("New task received to be added");
+  }
   request.response.add([]);
   request.response.close();
 }

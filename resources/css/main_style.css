@@ -1,14 +1,13 @@
 body {
     /*Ensures enough padding on left to prevent overlap with nav bar*/
-    padding-left: 180px;
+    margin-left: 180px;
     font-family: Tahoma, arial;
-    display: inline-block;
 }
 
 nav {
     position: fixed;
     width: 180px;
-    height: 100%;
+    min-height: 100%;
     background-color: grey;
     color: white;
     top: 0;
@@ -56,3 +55,22 @@ nav ul li a:hover {
     background-color: green;
 }
 
+
+form#createTask {
+    position: absolute;
+    float: right;
+    margin-left: 60px;
+    text-align: left;
+    z-index: 20;
+    top:10px;
+    right: 10px;
+    width: 400px;
+    padding: 20px;
+    background-color: rgba(200,200,200, 0.5);
+
+}
+
+#createTask input {
+    margin-top: 10px;
+    margin-bottom: 10px;
+}

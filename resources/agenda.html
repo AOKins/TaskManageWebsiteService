@@ -4,7 +4,7 @@
     <head>
         <title>My Agenda</title>
         <link href="css/task_style.css" type="text/css" rel="stylesheet" />
-        <script src="js/agenda.js" defer></script>
+        <script src="js/taskManage.js" defer></script>
     </head>
     <body onload="loadContent()">
         <!--Side navigation bar-->
@@ -18,93 +18,22 @@
             </ul>
         </nav>
         <!--Agenda list with id of today should show tasks with due date of today-->
-        <div class="agenda_list" id="today">
-            <div id="header">
-                Today
-            </div>
-            <div class="task">
-                <button label="check" class="check"></button>
-                <div id="title">
-                    Take out garbage
-                </div>
-                <div id="time">
-                    12:30am
-                </div>
-                <div id="description">
-                </div>
-            </div>
-            <div class="task">
-                <button label="check"></button>
-                <div id="title">
-                    Feed dog
-                </div>
-                <div id="time">
-                    6:30am
-                </div>
-                <div id="description">
-                    anxiety meds and 2 scoops of chow
-                </div>
-            </div>
+        <div class="listContainer">
+            <div id="header">Today</div>
+            <ul class="Tasklist" id="today"></ul>
         </div>
 
         <!--Agenda list with id of today should show tasks with due date of tomorrow and day after-->
-        <div class="agenda_list" id="next2days">
-            <div id="header">
-                Next 2 Days
-            </div>
-            <div class="task">
-                <button label="check"></button>
-                <div id="title">
-                    Take out garbage
-                </div>
-                <div id="time">
-                    12:30am
-                </div>
-                <div id="description">
-                </div>
-            </div>
-            <div class="task">
-                <button label="check"></button>
-                <div id="title">
-                    Feed dog
-                </div>
-                <div id="time">
-                    6:30am
-                </div>
-                <div id="description">
-                    anxiety meds and 2 scoops of chow
-                </div>
-            </div>
+        <div class="listContainer">
+            <div id="header">Next 2 Days</div>
+            <ul class="Tasklist" id="next2days"></ul>
         </div>
 
         <!--Agenda list with id of today should show tasks with due date within 7 days of today the first 3 days (today and next 2)-->
-        <div class="agenda_list" id="week">
-            <div id="header">
-                This Week
-            </div>
-            <div class="task">
-                <button label="check"></button>
-                <div id="title">
-                    Take out garbage
-                </div>
-                <div id="time">
-                    12:30am
-                </div>
-                <div id="description">
-                </div>
-            </div>
-            <div class="task">
-                <button label="check"></button>
-                <div id="title">
-                    Feed dog
-                </div>
-                <div id="time">
-                    6:30am
-                </div>
-                <div id="description">
-                    anxiety meds and 2 scoops of chow
-                </div>
-            </div>
+
+        <div class="listContainer">
+            <div id="header">Rest of the Week</div>
+            <ul class="Tasklist" id="week"></ul>
         </div>
     </body>
 </html>

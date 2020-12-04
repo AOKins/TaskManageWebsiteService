@@ -17,13 +17,14 @@ ul {
 }
 
 #calendarObject {
+    position: absolute;
+    left: 200px;
     padding-left: 20px;
 }
 
 .calendarDates {
     display: inline-grid;
     grid-template-columns: auto auto auto auto auto auto auto; /*7 columns for each day of week*/
-    grid-template-rows: auto auto auto auto auto auto; /*6 rows (weeks)*/
     grid-gap: 0;
     border: solid black 2px;
 }
@@ -52,11 +53,22 @@ ul {
     font-size: 22px;
     padding-bottom: 2px;
 }
-/*
+
 .calendarDates ul.past {
-    background-color: brown;
+    background-color: grey;
 } 
 
 .calendarDates ul.today {
     background-color: white;
-} */
+} 
+.calendarDates ul.future {
+    background-color: grey;
+} 
+
+.calendar_button {
+    position: relative;
+    float: right;
+    height:50px;
+    width: 50px;
+    top: 10px;
+}

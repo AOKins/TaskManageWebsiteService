@@ -27,8 +27,6 @@ Map<String,String> convertBody(String input) {
   return result;
 }
 
-
-
 // Takes the path and returns the binary result
 // Input: filePath - string to where the file is
 // Output: returns the file contents as bytes, null if error occurs (outputs error to terminal)
@@ -69,7 +67,9 @@ bool verifyLoginCred(String givenUser, String givenPass) {
 }
 
 
-// input tells what needs to be updated
+// Method called when needing to update data
+// Input: inputData - map that contains the inputted data relevant to the update (such as task_id and new description)
+// Output: DBMS should be updated
 void updateData(Map<String,String> inputData) {
-
+  print("A request to update data was received");
 }
