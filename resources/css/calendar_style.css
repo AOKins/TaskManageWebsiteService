@@ -31,8 +31,8 @@ ul {
 
 .calendarDates ul.date {
     background-color: white;
-    width: 200px;
-    height: 140px;
+    width: 180px;
+    height: 170px;
     border: solid black 2px;
     margin: 0px;
 }
@@ -40,8 +40,11 @@ ul {
 .calendarDates ul.date li {
     padding: 0;
     margin: 5px;
-    margin-left: 10px;
     color: black;
+    font-size: 14px;
+    background-color: rgba(0,0,0,0.1);
+    padding-top: 2px;
+    padding-bottom: 2px;
 }
 
 .calendarDates ul.date li#number {
