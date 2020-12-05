@@ -59,10 +59,10 @@ ul {
 } 
 
 .calendarDates ul.today {
-    background-color: white;
+    background-color: lightcoral;
 } 
 .calendarDates ul.future {
-    background-color: grey;
+    background-color: lightgrey;
 } 
 
 .calendar_button {

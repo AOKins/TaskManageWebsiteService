@@ -35,15 +35,18 @@ function generateCalendar(month, year) {
         dList.setAttribute("id", "number");
         dList.appendChild(document.createTextNode(date.getDate()));
         dNode.appendChild(dList);
+
         datesObj.appendChild(dNode);
 
         // Append tasks for this date here
     }
-
     // Now iterate through each date through the month, CSS handles the individual weeks
     for (; date.getMonth() == month; date.setDate(date.getDate()+1)) {
         var dNode = document.createElement("UL");
         dNode.setAttribute("class", "date");
+        if (date.toDateString() == now.toDateString()) {
+            dNode.setAttribute("class", "date today")
+        }
         var dList = document.createElement("LI");
         dList.setAttribute("id", "number");
         dList.appendChild(document.createTextNode(date.getDate()));
