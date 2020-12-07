@@ -5,6 +5,7 @@
         <title>My Calendar</title>
         <link href="css/calendar_style.css" type="text/css" rel="stylesheet" />
         <script src="js/calendar.js" defer></script>
+        <script src="js/createForm.js" defer></script>
     </head>
     <body onload="loadContent()">
         <!--Side navigation bar-->
@@ -17,6 +18,16 @@
                 <li><a href="settings.html">Settings</a></li>
             </ul>
         </nav>
+        <div id="createForm">
+            <form id="createTask" class="hide" method="POST" >
+                <input type="text" id="title" name="title" placeholder="Task Title" required><br>
+                <textarea id="desc" name="desc" placeholder="Task Description" rows="4" cols="40"></textarea><br>
+                <input type="date" name="due_date" id="due_date"  required>
+                <input type="time" name="due_time" id="due_time" value='23:59'><br>
+                <input type="submit" name="submission" value="Create Task">
+            </form>
+            <button id="display" enabled>X</button>
+        </div>
         
         <!-- Example calendar, actual implementation should use javascript to load in data-->
         <div id="calendarObject">

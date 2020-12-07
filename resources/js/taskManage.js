@@ -53,7 +53,6 @@ function appendTask(listStart, task) {
 // Function to add task content as a JSON file into the main_list 
 // Calls appendTask function for each task
 function outputTasks(jsonContent) {
-
     // date variable to handle non-today date info neeeded to be stored/accessed as string
     var date;
     // object for list of nodes that are of class "Tasklist"

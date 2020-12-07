@@ -5,6 +5,7 @@
         <title>Home</title>
         <link href="css/task_style.css" type="text/css" rel="stylesheet" />
         <script src="js/taskManage.js" defer></script>
+        <script src="js/createForm.js" defer></script>
     </head>
     <body onload="loadContent()">
         <!--Side navigation bar-->
@@ -17,14 +18,16 @@
                 <li><a href="settings.html">Settings</a></li>
             </ul>
         </nav>
-
-        <form id="createTask" class="hide" method="POST" >
-            <input type="text" id="title" name="title" placeholder="Task Title" required><br>
-            <textarea id="desc" name="desc" placeholder="Task Description" rows="4" cols="40"></textarea><br>
-            <input type="date" name="due_date" id="due_date"  required>
-            <input type="time" name="due_time" id="due_time" value='23:59'><br>
-            <input type="submit" name="submission" value="Create Task">
-        </form></a>
+        <div id="createForm">
+            <form id="createTask" class="hide" method="POST" >
+                <input type="text" id="title" name="title" placeholder="Task Title" required><br>
+                <textarea id="desc" name="desc" placeholder="Task Description" rows="4" cols="40"></textarea><br>
+                <input type="date" name="due_date" id="due_date"  required>
+                <input type="time" name="due_time" id="due_time" value='23:59'><br>
+                <input type="submit" name="submission" value="Create Task">
+            </form>
+            <button id="display" enabled>X</button>
+        </div>
 
         <!-- The task objects are to be dynamically added into this div, for css setup there may be hard-coded examples-->
         <div class="listContainer">
