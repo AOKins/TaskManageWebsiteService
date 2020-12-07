@@ -15,13 +15,18 @@
                 <li><a href="home.html">Home</a></li>
                 <li><a href="calendar.html" class="active">Calendar</a></li>
                 <li><a href="agenda.html">Agenda</a></li>
-                <li><a href="settings.html">Settings</a></li>
             </ul>
         </nav>
         <div id="createForm">
             <form id="createTask" class="hide" method="POST" >
                 <input type="text" id="title" name="title" placeholder="Task Title" required><br>
                 <textarea id="desc" name="desc" placeholder="Task Description" rows="4" cols="40"></textarea><br>
+                <select id="category" name="category">
+                    <option value="CS-374">CS-374</option>
+                    <option value="Gaming Review">Gaming Review</option>
+                    <option value="Example3">Example3</option>
+                    <option value="Example4">Example4</option>
+                </select>
                 <input type="date" name="due_date" id="due_date"  required>
                 <input type="time" name="due_time" id="due_time" value='23:59'><br>
                 <input type="submit" name="submission" value="Create Task">
@@ -29,7 +34,6 @@
             <button id="display" enabled>X</button>
         </div>
         
-        <!-- Example calendar, actual implementation should use javascript to load in data-->
         <div id="calendarObject">
             <button class="calendar_button" onclick="changeMonth(true)">></button>
             <button class="calendar_button" onclick="changeMonth(false)"><</button>
@@ -38,8 +42,15 @@
                 <li id="month"></li>
                 <li id="year"></li>
             </ul>
-            <div class="calendarDates">
-            </div>
+            <div id="calendarDates"></div>
+        </div>
+
+        <ul id="dateList">
+            <div id="header">6 December 2020</div>
+            
+            <li class="task"><div >
+                
+            </div></li>
         </div>
     </body>
 </html>

@@ -9,18 +9,34 @@ var currentMonth = new Date(); // variable to hold what the displayed month is w
 // variables to contain common Nodes for less repetitive declarations  
 var monthTag = document.getElementById("month")
 var yearTag = document.getElementById("year")
-var datesObj = document.getElementsByClassName("calendarDates")[0];
+var datesObj = document.getElementById("calendarDates");
 
 // Function to append list task items into a calendar date
 // Input: node for where the current date item is
 //        date for what the date is to access the correct tasks
 function loadTasksForDate(node, date, jsonData) {
+    // Store/Convert the date item into a string item
     var dateS = date.getFullYear() + "-" + (date.getMonth()+1) + "-" + (date.getDate());
     var listItem;
-    for (task in jsonData[dateS] ) {
-        listItem = document.createElement("LI");
-        listItem.appendChild(document.createTextNode(jsonData[dateS][task].title));
-        node.appendChild(listItem);
+    var outputCount = 0;
+    // Iterate through each task associated with the date, appending just the title as a list item into the date box
+    for (task in jsonData[dateS]) {
+        if (jsonData[dateS][task].checked == false) {
+            if (outputCount < 4) {
+                listItem = document.createElement("LI");
+                listItem.appendChild(document.createTextNode(jsonData[dateS][task].title));
+                node.appendChild(listItem);    
+            }
+            else if (outputCount == 4) {
+                listItem = document.createElement("LI");
+                listItem.appendChild(document.createTextNode("..."));
+                node.appendChild(listItem);
+            }
+            else {
+                break;
+            }
+            outputCount++;
+        }
     }
     
 }

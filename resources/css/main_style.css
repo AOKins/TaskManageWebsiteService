@@ -57,7 +57,7 @@ nav ul li a:hover {
 
 #createForm {
     position: fixed;
-    left:45%;
+    left:40vw;
     bottom: 100%;
     text-align: center;
     z-index: 20;

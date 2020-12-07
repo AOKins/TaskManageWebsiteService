@@ -61,6 +61,7 @@ function outputTasks(jsonContent) {
     // Index number for accessing a list in the list of lists
     var list;
     for (list = 0; list < numLists; list++) {
+        listOfLists[list].innerHTML="";
         // If the list is for tasks related to today
         if (listOfLists[list].id == "today") {
             // Use today's date (today_S) as the key
@@ -106,42 +107,6 @@ async function loadContent()  {
     }
 }
 
-// Get the Node for createTask form identified by id "createTask"
-var formObj = document.getElementById("createTask");
-if (formObj != null) {
-    // Add an event listener for when submit is activated and perform the POST request when it happens 
-    formObj.addEventListener("submit", async function(event) {
-        // Preventing default reload request/expectation
-        event.preventDefault();
-        // Get the form object in the document
-        
-        // Iterate through the form data, appending onto a string
-        // i is index value, s_content to contain what is within the input fields and will be body of POST request
-        var i, s_content;
-        // Make sure to initialize s_content to empty string before adding anything
-        s_content = "";
-        for (i = 0; i < formObj.length-1; i++) {
-            // Add this input field's content, using id to identify the variable being set
-            s_content += formObj[i].id + "=" + formObj[i].value + "&";
-            formObj[i].value = "";
-        }
-        // Will need to remove the last "&"
-        s_content = s_content.substring(0, s_content.length-1);
-
-        // Alert for debugging, must remove when satisified with this function
-        alert(s_content);
-    
-        // Send the new task to the server as a POST request with submission value set to createTask so it is identifiable as this kind of request
-        var myRequest = new XMLHttpRequest();
-        myRequest.open("POST", "/", true);
-        myRequest.setRequestHeader("Content-type", "text/plain");
-        myRequest.send("submission=createTask&" + s_content);
-    
-        // Call loadContent() to update the task lists
-        loadContent();
-    });
-    
-}
 
 // Function to handle the event of a task's button being called, argument is the task's id value
 function taskButtonHandler(id) {
