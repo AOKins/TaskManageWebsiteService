@@ -4,6 +4,7 @@
             "task_id" : 1,
             "title" : "Feed dog",
             "desc" : "2 scoops of chow",
+            "category" : "House Chores",
             "date" : "2020-12-4",
             "due" : "12:35am",
             "checked": false
@@ -11,6 +12,7 @@
         {
             "task_id" : 2,
             "title" : "Take out trash",
+            "category" : "House Chores",
             "desc" : "hurry!",
             "date" : "2020-12-4",
             "checked": true
@@ -18,6 +20,7 @@
         {
             "task_id" : 3,
             "title" : "Take out trash",
+            "category" : "House Chores",
             "desc" : "hurry!",
             "date" : "2020-12-4",
             "due" : "12:35pm",
@@ -29,6 +32,7 @@
             "task_id" : 4,
             "title" : "Feed dog",
             "desc" : "2 scoops of chow",
+            "category" : "House Chores",
             "date" : "2020-12-5",
             "due" : "12:35am",
             "checked": false
@@ -36,6 +40,7 @@
         {
             "task_id" : 5,
             "title" : "Call your mother",
+            "category" : "Misc",
             "date" : "2020-12-5",
             "desc" : "she be angry!",
             "checked": true
@@ -43,6 +48,7 @@
         {
             "task_id" : 6,
             "title" : "Run",
+            "category" : "CS-374",
             "desc" : "now",
             "date" : "2020-12-5",
             "due" : "12:35pm",
@@ -53,6 +59,7 @@
         {
             "task_id" : 7,
             "title" : "In the not too distant future",
+            "category" : "CS-374",
             "desc" : "next sunday a.d.",
             "date" : "2020-12-6",
             "due" : "12:35am",
@@ -61,6 +68,7 @@
         {
             "task_id" : 8,
             "title" : "Call your mother",
+            "category" : "CS-374",
             "date" : "2020-12-6",
             "due" : "10:35pm",
             "desc" : "she be angry!",
@@ -69,6 +77,7 @@
         {
             "task_id" : 9,
             "title" : "Run",
+            "category" : "CS-374",
             "desc" : "now",
             "date" : "2020-12-6",
             "due" : "12:35pm",
@@ -77,6 +86,34 @@
         {
             "task_id" : 9,
             "title" : "Run",
+            "desc" : "now",
+            "date" : "2020-12-6",
+            "due" : "12:35pm",
+            "category" : "CS-374",
+            "checked": false
+        },
+        {
+            "task_id" : 8,
+            "title" : "Call your mother",
+            "date" : "2020-12-6",
+            "due" : "10:35pm",
+            "category" : "CS-374",
+            "desc" : "she be angry!",
+            "checked": true
+        },
+        {
+            "task_id" : 9,
+            "title" : "Run",
+            "category" : "CS-374",
+            "desc" : "now",
+            "date" : "2020-12-6",
+            "due" : "12:35pm",
+            "checked": false
+        },
+        {
+            "task_id" : 9,
+            "title" : "Run",
+            "category" : "CS-374",
             "desc" : "now",
             "date" : "2020-12-6",
             "due" : "12:35pm",
@@ -85,6 +122,7 @@
         {
             "task_id" : 8,
             "title" : "Call your mother",
+            "category" : "CS-374",
             "date" : "2020-12-6",
             "due" : "10:35pm",
             "desc" : "she be angry!",
@@ -93,6 +131,7 @@
         {
             "task_id" : 9,
             "title" : "Run",
+            "category" : "CS-374",
             "desc" : "now",
             "date" : "2020-12-6",
             "due" : "12:35pm",
@@ -101,6 +140,7 @@
         {
             "task_id" : 9,
             "title" : "Run",
+            "category" : "CS-374",
             "desc" : "now",
             "date" : "2020-12-6",
             "due" : "12:35pm",
@@ -109,6 +149,7 @@
         {
             "task_id" : 8,
             "title" : "Call your mother",
+            "category" : "CS-374",
             "date" : "2020-12-6",
             "due" : "10:35pm",
             "desc" : "she be angry!",
@@ -118,6 +159,7 @@
             "task_id" : 9,
             "title" : "Run",
             "desc" : "now",
+            "category" : "CS-374",
             "date" : "2020-12-6",
             "due" : "12:35pm",
             "checked": false
@@ -126,30 +168,7 @@
             "task_id" : 9,
             "title" : "Run",
             "desc" : "now",
-            "date" : "2020-12-6",
-            "due" : "12:35pm",
-            "checked": false
-        },
-        {
-            "task_id" : 8,
-            "title" : "Call your mother",
-            "date" : "2020-12-6",
-            "due" : "10:35pm",
-            "desc" : "she be angry!",
-            "checked": true
-        },
-        {
-            "task_id" : 9,
-            "title" : "Run",
-            "desc" : "now",
-            "date" : "2020-12-6",
-            "due" : "12:35pm",
-            "checked": false
-        },
-        {
-            "task_id" : 9,
-            "title" : "Run",
-            "desc" : "now",
+            "category" : "CS-374",
             "date" : "2020-12-6",
             "due" : "12:35pm",
             "checked": false
@@ -159,6 +178,7 @@
         {
             "task_id" : 10,
             "title" : "In the not too distant future",
+            "category" : "CS-374",
             "desc" : "next sunday a.d.",
             "date" : "2020-12-7",
             "due" : "12:35am",
@@ -168,6 +188,7 @@
             "task_id" : 11,
             "title" : "Call your mother",
             "date" : "2020-12-7",
+            "category" : "CS-374",
             "due" : "10:35pm",
             "desc" : "she be angry!",
             "checked": true
@@ -176,6 +197,7 @@
             "task_id" : 12,
             "title" : "Run",
             "desc" : "now",
+            "category" : "CS-374",
             "date" : "2020-12-7",
             "due" : "12:35pm",
             "checked": false
@@ -185,6 +207,7 @@
         {
             "task_id" : 13,
             "title" : "In the not too distant future",
+            "category" : "CS-374",
             "desc" : "next sunday a.d.",
             "date" : "2020-12-8",
             "due" : "12:35am",
@@ -194,6 +217,7 @@
             "task_id" : 14,
             "title" : "Call your mother",
             "date" : "2020-12-8",
+            "category" : "CS-374",
             "due" : "10:35pm",
             "desc" : "she be angry!",
             "checked": true
@@ -202,6 +226,7 @@
             "task_id" : 15,
             "title" : "Run",
             "desc" : "now",
+            "category" : "CS-374",
             "date" : "2020-12-8",
             "due" : "12:35pm",
             "checked": false
@@ -211,6 +236,7 @@
         {
             "task_id" : 16,
             "title" : "In the not too distant future",
+            "category" : "CS-374",
             "desc" : "next sunday a.d.",
             "date" : "2020-12-9",
             "due" : "12:35am",
@@ -221,6 +247,7 @@
             "title" : "Call your mother",
             "date" : "2020-12-9",
             "due" : "10:35pm",
+            "category" : "CS-374",
             "desc" : "she be angry!",
             "checked": true
         },

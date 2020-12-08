@@ -1,7 +1,8 @@
 import 'dart:core';
 import 'dart:io';
 import 'mime.dart'; // Mime type map object is defined in seperate file
-import 'helpfulFuncs.dart';
+import 'fileContent.dart';
+import 'databaseMethods.dart';
 import 'dart:convert' show utf8; // For converting POST requests body content into a more usable format
 
 // Handles the getting of resources for a client (GET requests or resources for POST request)
@@ -13,16 +14,18 @@ void handleGet(HttpRequest request, bool loginThruPost) async {
   String filePath = request.uri.toString();
   bool verified = loginThruPost;
   // Determine if they are logged in by checking the cookies
-  if (request.headers["Cookie"] != null) {
+  if (request.headers["Cookie"] != null && !verified) {
     verified = verifyCookieAccess(request.headers["Cookie"] as List<String>);
   }
   // If accessing the default directory, set to home page by default
   if ((filePath == "/" && verified) || (filePath == "/login.html" && verified)) {
     filePath = "/home.html";
   }
-  // If actually not verified, redirect to login page
-  if (!verified && (filePath.contains(".html") || filePath == "/")) {
-    filePath = "/login.html";
+  // If actually not verified, redirect if going to wrong place
+  if (!verified && (filePath.contains(".html"))) {
+    if (filePath != "/login.html" && filePath != "/signup.html") {
+      filePath == "/login.html";
+    }
   }
   // Append path to resources
   filePath = "../resources" + filePath;
@@ -32,8 +35,8 @@ void handleGet(HttpRequest request, bool loginThruPost) async {
   request.response.headers.add("content-type", mimeTypesMap[fileFormat] ?? "application/octet-stream");
   // Write response and close, ending conversation
   var bodyContent = fileContentsBytes(filePath);
-  // If the content is null, then the resource was not found
 
+  // If the content is empty, then the resource is assumed not found (404 error code)
   request.response.statusCode = (bodyContent != []) ? 200 : 404;
   request.response.add(bodyContent);
   request.response.close();
@@ -51,20 +54,21 @@ void handlePost(HttpRequest request) async {
     // Verify login
     if (verifyLoginCred(bodyMap["username"] as String, bodyMap["password"] as String)) {
       // Currently bad implementation of cookie, needs to use database/encryption or something to make much more secure and also identifiable for a specific account
-      request.response.headers.add("Set-Cookie", "validcookie");
+      request.response.headers.add("Set-Cookie", "1");
       loggedIn = true;
     }
     // Have handleGet perform the resulting body content for home.html
-    handleGet(request, loggedIn);
+    return handleGet(request, loggedIn);
   }
   else if (bodyMap["submission"] == "updateTask") {
     updateData(bodyMap);
   }
   else if (bodyMap["submission"] == "createTask") {
-    print("New task received to be added");
+    createTask(bodyMap);
   }
   request.response.add([]);
   request.response.close();
+  return;
 }
 
 //Helpful resource to developing initial understanding of HttpServer on Dart and approach to its implementation https://dart.dev/tutorials/server/httpserver

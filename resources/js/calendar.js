@@ -2,7 +2,6 @@
 
 // The general layout (7 days and 6 weeks) is already in place in the html file
 var monthName = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
-var weekDates = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
 var now = new Date(); // variable to hold what the current date is
 var currentMonth = new Date(); // variable to hold what the displayed month is which may not be today's month
 
@@ -32,7 +31,7 @@ function loadTasksForDate(node, date, jsonData) {
                 listItem.appendChild(document.createTextNode("..."));
                 node.appendChild(listItem);
             }
-            else {
+            else { // outputCount > 5, need to end outputting from the loop
                 break;
             }
             outputCount++;
@@ -110,7 +109,7 @@ async function generateCalendar(month, year, jsonContent) {
 // Script function called when the html page has loaded, handles loading the page content
 async function loadContent()  {
     // Default loading is to current month and year    // Fetch the data and wait for response
-    let data = await fetch(location.protocol + "//" + location.host + ":80" + '/test_data/today.json');
+    let data = await fetch(location.protocol + "//" + location.host + ":80" + '/test_data/test.json');
     if (!data.ok) {
         alert("Could not establish connection to server");
     }

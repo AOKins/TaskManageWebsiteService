@@ -7,7 +7,7 @@
         <script src="js/taskManage.js" defer></script>
         <script src="js/createForm.js" defer></script>
     </head>
-    <body onload="loadContent()">
+    <body onload="loadContent(); getCategories()">
         <!--Side navigation bar-->
         <nav>
             <img id="logo" src="images/logo.png">
@@ -18,15 +18,12 @@
             </ul>
         </nav>
         <div id="createForm">
-            <form id="createTask" class="hide" method="POST" >
+            <form id="createTask" class="hide" method="POST">
                 <input type="text" id="title" name="title" placeholder="Task Title" required><br>
                 <textarea id="desc" name="desc" placeholder="Task Description" rows="4" cols="40"></textarea><br>
-                <select id="category" name="category">
-                    <option value="CS-374">CS-374</option>
-                    <option value="Gaming Review">Gaming Review</option>
-                    <option value="Example3">Example3</option>
-                    <option value="Example4">Example4</option>
-                </select>
+                <select id="category" name="category" required></select>
+                <input type="text" id="categoryText" name="categoryText" placeholder="New Category">
+                <br>
                 <input type="date" name="due_date" id="due_date"  required>
                 <input type="time" name="due_time" id="due_time" value='23:59'><br>
                 <input type="submit" name="submission" value="Create Task">

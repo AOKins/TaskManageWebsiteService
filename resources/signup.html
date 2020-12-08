@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+    <meta charset="utf-8">
+    <head>
+        <title>Sign Up</title>
+        <link href="css/signup_style.css" type="text/css" rel="stylesheet" />
+    </head>
+    <body>
+        <br>THE TOTALLY SECURE SIGN UP PAGE<br><br>
+        <form id="loginForm" action="/" method="POST">
+            <label for="username">Username:</label>
+            <input type="text" id="username" name="username" required><br>
+            <label for="password">Password:</label>
+            <input type="password" id="password" name="password" required><br><br>
+            <label for="confirmP">Confirm Password:</label>
+            <input type="password" id="confirmP" name="confirmP" required><br><br>
+            <input type="submit" id="submission" name="submission" value="Create User">
+        </form>
+        <br>Already Have an Account? <a href="login.html">Back to Login!</a>
+    </body>
+</html>
+
+<script>
+    // Need to have check for confirm password and also determine if the user already exists by getting response from server before moving on
+</script>

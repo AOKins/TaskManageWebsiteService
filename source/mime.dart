@@ -8,6 +8,5 @@ const Map<String,String> mimeTypesMap = <String,String> {
   'png'   : 'image/png',
   'ico'   : 'image/vnd.microsoft.icon',
   'gif'   : 'image/gif',
-  'data'  : 'text/plain',  // data is interpreted as plain text
   'json'  : 'text/json',
 };

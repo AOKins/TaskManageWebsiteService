@@ -12,7 +12,7 @@ var today_S = today.getFullYear() + "-" + (today.getMonth()+1) + "-" + (today.ge
 function appendTask(listStart, task) {
     // Create element that is to contain the task
     var taskContainer = document.createElement("LI");
-    taskContainer.setAttribute("class", "task " + !task.checked);
+    taskContainer.setAttribute("class", "task " + !task.checked + " " + task.category);
 
     // Id is equal to the id of the task in the database
     taskContainer.setAttribute("id", task.task_id);
@@ -97,7 +97,7 @@ function outputTasks(jsonContent) {
 // Script function called when the html body has loaded, handles loading the page's tasks
 async function loadContent()  {
     // Fetch the data and wait for response
-    let data = await fetch(location.protocol + "//" + location.host + ":80" + '/test_data/today.json');
+    let data = await fetch(location.protocol + "//" + location.host + ":80" + '/test_data/test.json');
     if (!data.ok) {
         alert("Could not establish connection to server");
     }
@@ -114,11 +114,12 @@ function taskButtonHandler(id) {
     var this_task = document.getElementById(id);
     var task_checked = this_task.classList.contains("true");
     // Update locally the task's status by updating its attribute
+    this_task.setAttribute("class", "task");
     if (task_checked) {
-        this_task.setAttribute("class", "task false");
+        this_task.classList.add("false");
     }
     else {
-        this_task.setAttribute("class", "task true");    
+        this_task.classList.add("true");
     }
     // Update the database's task data using a POST request
     var myRequest = new XMLHttpRequest();

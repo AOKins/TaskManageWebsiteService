@@ -8,6 +8,10 @@ var formObj = document.getElementById("createForm");
 // Node for createTask form identified by id "createTask"
 var form = document.getElementById("createTask");
 // Initially show is false (set to hidden)
+var categoryInput = document.getElementById("category");
+
+var categoryText = document.getElementById("categoryText");
+
 var show = false;
 
 if (formObj != null && form != null) {
@@ -52,4 +56,51 @@ if (formObj != null && form != null) {
         // Call loadContent() (assumed to be in another javascript file for the respective page this is attached to)
         loadContent();
     });
+}
+
+if (categoryInput != null) {
+    var previousValue = categoryInput.value;
+    categoryInput.addEventListener("click", function(){
+        if (categoryInput.value != previousValue) {
+            if (categoryInput.value == "*New*") {
+                categoryText.style.display ="inline";
+            }
+            else if (previousValue == "*New*")  {
+                categoryText.style.display ="none";
+            }
+        }
+        previousValue = categoryInput.value;
+    });
+}
+
+function appendingCategories(content) {
+    var jsonContent = JSON.parse(content);
+    
+    var option;
+    for (i in jsonContent.categories) {
+        option = document.createElement("OPTION");
+        option.setAttribute("value", jsonContent.categories[i]);
+        option.innerHTML = jsonContent.categories[i];
+        categoryInput.appendChild(option);
+    }
+    option = document.createElement("OPTION");
+    option.setAttribute("value", "*New*");
+    option.innerHTML = "*New*";
+    categoryInput.appendChild(option);
+
+}
+
+
+async function getCategories() {
+    var categoryObj = document.getElementById("category");
+    if (categoryObj != null) {
+        let data = await fetch(location.protocol + "//" + location.host + ":80" + '/test_data/categories.json');
+        if (!data.ok) {
+            alert("Could not establish connection to server for category data");
+        }
+        // If received the data okay, call outputTasks with JSON parsing of the content
+        else {
+            data.text().then((content) => appendingCategories(content));
+        }
+    }
 }
