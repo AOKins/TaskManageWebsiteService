@@ -1,7 +1,6 @@
 // Javascript file to hold behavior related to the create Task form
-// Assumes that there is a function loadContent() in another javascript file loaded by the page that can be called to refresh the tasks
 
-// Node to 
+// Node for show button that toggles the display of the form or not
 var showButtonNode = document.getElementById("display");
 // Node for the entire form object idenified 
 var formObj = document.getElementById("createForm");
@@ -9,11 +8,13 @@ var formObj = document.getElementById("createForm");
 var form = document.getElementById("createTask");
 // Initially show is false (set to hidden)
 var categoryInput = document.getElementById("category");
-
+// Node for the form input that allows the user to create new category for their new task
 var categoryText = document.getElementById("categoryText");
 
+// True when the form should be visible the client
 var show = false;
 
+// Add event listener for the show button of the form to adjust the height when clicked
 if (formObj != null && form != null) {
     // Define the behavior for the show button
     showButtonNode.addEventListener("click", function() {
@@ -58,6 +59,7 @@ if (formObj != null && form != null) {
     });
 }
 
+// Add an click listner for category input to dynamically show the category name text only when *New* option selected
 if (categoryInput != null) {
     var previousValue = categoryInput.value;
     categoryInput.addEventListener("click", function(){
@@ -73,6 +75,7 @@ if (categoryInput != null) {
     });
 }
 
+// Function for adding categories into categoryInput tag for create Task form
 function appendingCategories(content) {
     var jsonContent = JSON.parse(content);
     
@@ -90,11 +93,11 @@ function appendingCategories(content) {
 
 }
 
-
+// A function called onload, gets categories from the server and appends to the form for drop-down selection
 async function getCategories() {
     var categoryObj = document.getElementById("category");
     if (categoryObj != null) {
-        let data = await fetch(location.protocol + "//" + location.host + ":80" + '/test_data/categories.json');
+        let data = await fetch(location.protocol + "//" + location.host + '/test_data/test.json');
         if (!data.ok) {
             alert("Could not establish connection to server for category data");
         }

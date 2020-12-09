@@ -1,4 +1,3 @@
-
 // Map to contain the mime types for common file types used
 // Reference: https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/MIME_types/Common_types
 const Map<String,String> mimeTypesMap = <String,String> {

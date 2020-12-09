@@ -97,7 +97,7 @@ function outputTasks(jsonContent) {
 // Script function called when the html body has loaded, handles loading the page's tasks
 async function loadContent()  {
     // Fetch the data and wait for response
-    let data = await fetch(location.protocol + "//" + location.host + ":80" + '/test_data/test.json');
+    let data = await fetch(location.protocol + "//" + location.host + '/test_data/test.json');
     if (!data.ok) {
         alert("Could not establish connection to server");
     }
@@ -106,7 +106,6 @@ async function loadContent()  {
         data.text().then((content) => outputTasks(JSON.parse(content)));
     }
 }
-
 
 // Function to handle the event of a task's button being called, argument is the task's id value
 function taskButtonHandler(id) {
@@ -125,6 +124,6 @@ function taskButtonHandler(id) {
     var myRequest = new XMLHttpRequest();
     myRequest.open("POST", "/", true);
     myRequest.setRequestHeader("Content-type", "text/plain");
-    myRequest.send("submission=updateTask&task_id=" + id + "&checked=" + task_checked);
+    myRequest.send("submission=updateTask&task_id=" + id + "&completion=" + task_checked);
     // Assuming no need for response
 }

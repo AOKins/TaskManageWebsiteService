@@ -17,6 +17,7 @@
                 <li><a href="agenda.html">Agenda</a></li>
             </ul>
         </nav>
+        <!--Form for creating new tasks-->
         <div id="createForm">
             <form id="createTask" class="hide" method="POST">
                 <input type="text" id="title" name="title" placeholder="Task Title" required><br>
@@ -28,6 +29,7 @@
                 <input type="time" name="due_time" id="due_time" value='23:59'><br>
                 <input type="submit" name="submission" value="Create Task">
             </form>
+            <!--Toggles whether to show the form or not, should always be visible-->
             <button id="display" enabled>X</button>
         </div>
 

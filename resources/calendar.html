@@ -17,6 +17,7 @@
                 <li><a href="agenda.html">Agenda</a></li>
             </ul>
         </nav>
+        <!--Form for creating new tasks-->
         <div id="createForm">
             <form id="createTask" class="hide" method="POST">
                 <input type="text" id="title" name="title" placeholder="Task Title" required><br>
@@ -28,9 +29,10 @@
                 <input type="time" name="due_time" id="due_time" value='23:59'><br>
                 <input type="submit" name="submission" value="Create Task">
             </form>
+            <!--Toggles whether to show the form or not, should always be visible-->
             <button id="display" enabled>X</button>
         </div>
-        
+        <!--Calender object that is to show the tasks in a given month-->        
         <div id="calendarObject">
             <button class="calendar_button" onclick="changeMonth(true)">></button>
             <button class="calendar_button" onclick="changeMonth(false)"><</button>
@@ -41,7 +43,7 @@
             </ul>
             <div id="calendarDates"></div>
         </div>
-
+        <!--WIP object to show list of tasks on a selected date-->        
         <ul id="dateList">
             <div id="header">6 December 2020</div>
             
