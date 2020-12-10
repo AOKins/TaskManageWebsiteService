@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:mysql1/mysql1.dart'; // For connecting into MySQL
 
 // A simple handler to return results of a query from the task_manager database
@@ -37,14 +39,17 @@ Future<Results> performQueryOnMySQL(String query) async {
 // Output: true if atleast one of the cookies is valid
 Future<String> verifyCookieAccess(List<String> cookies) async {
   // Finally, close the connection
-  for (int i = 0; i < cookies.length; i++) {
-    var results = await performQueryOnMySQL('SELECT COUNT(*) FROM task_manager.user WHERE ID = ' + cookies[i]);
-    // Like verifyLoginCred, this is a hard coded bad method that needs to be replaced with usage of the database
-    for (var row in results) {
-      if (row[0] >= 0) {
-        return cookies[i];
+  if (cookies.length != null) {
+    for (int i = 0; i < cookies.length; i++) {
+      var results = await performQueryOnMySQL('SELECT COUNT(*) FROM task_manager.user WHERE ID = ' + cookies[i]);
+      // Like verifyLoginCred, this is a hard coded bad method that needs to be replaced with usage of the database
+      for (var row in results) {
+        if (row[0] > 0) {
+          return cookies[i];
+        }
       }
     }
+    print("not verified");
   }
   return "";
 }
@@ -55,7 +60,9 @@ Future<String> verifyLoginCred(String givenUser, String givenPass) async {
   String query = "SELECT ID FROM task_manager.user WHERE username = '$givenUser' AND password='$givenPass'";  
   var results = await performQueryOnMySQL(query);
   for (var row in results) {
-    return row[0].toString();
+    if (row[0] != 0) {
+      return row[0].toString();
+    }
   }
 }
 
@@ -75,4 +82,59 @@ void updateTask(Map<String,String> inputData) {
 
 void createTask(Map<String,String> inputData) {
     print("New task received to be added");
+}
+
+// Method to getting a task
+Future<List<int>> getTask(Map<String,String> inputData) async {
+  String startRange = inputData["startDate"];
+  String endRange = inputData["endDate"];
+  String user_id = inputData["user_id"];
+  print("S:$startRange" + "\tE:$endRange" + "\tID:$user_id\n" );
+  //ownerID=$user_id AND 
+  String query = "SELECT ID, title, description, dateTime, completion FROM task_manager.task WHERE DATE(dateTime) >= '$startRange' AND DATE(dateTime) <= '$endRange' ORDER BY dateTime";
+
+  Map<String, List< Map<String,String>>> content = new Map();
+  Results results = await performQueryOnMySQL(query);
+
+  String dateTime, date, time;// temp holder for a row's dateTime
+  // For each row, append into the content map the row's data as a adding on the list a new map
+  results.forEach((row) => {
+    // Get the time and date seperately
+    dateTime = row[3].toString(),
+    time = dateTime.substring(dateTime.indexOf(' ') + 1),
+    date = dateTime.substring(0, dateTime.indexOf(' ') ),
+
+    // If this date does not point to a list (first row with this date), then set to new list
+    content[date] ??= new List(),
+
+    // Using this row's data, append a new map to the list
+    content[date].add(
+      {
+        "task_id": row[0].toString(),
+        "title" : row[1].toString(),
+        "desc" : row[2].toString(),
+        "date" : date,
+        "due" : time,
+        "checked" : row[4] == 0 ? "false" : "true",
+      }
+    )
+  });
+
+
+  String jsonContent = json.encode(content);
+  print(jsonContent);
+  
+  return utf8.encode(jsonContent);
+}
+
+Future<List<int>> getCategories(Map<String,String> inputData) async {
+  String userID = inputData["user_id"];
+  String query = "SELECT * FROM task_manager.categories, task_manager.user WHERE task_manager.categories.ownerID = $userID";
+  Results results = await performQueryOnMySQL(query);
+  var row;
+  print("getting cats");
+  for (row in results) {
+    print(row[0].toString());
+  }
+
 }

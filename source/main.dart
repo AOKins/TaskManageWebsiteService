@@ -18,10 +18,9 @@ void handleGet(HttpRequest request, bool loginThruPost) async {
   if (request.headers["Cookie"] != null && verifiedS != "") {
     verifiedS = await verifyCookieAccess(request.headers["Cookie"] as List<String>);
   }
-
   // If accessing the default directory, set to home page by default
   if (filePath == "/") {
-    if (verifiedS != "") {
+    if (verifiedS == "") {
       filePath = "/login.html";
     }
     else {
@@ -52,11 +51,13 @@ void handlePost(HttpRequest request) async {
   Map<String,String> bodyMap = convertBody(await utf8.decodeStream(request));
   
   bool loggedIn = false;
-  
+
+  List<int> result;
+
   if (bodyMap["submission"] == "login") {
     String verifyS = await verifyLoginCred(bodyMap["username"] as String, bodyMap["password"] as String);
     // Verify login
-    if (verifyS != "") { // If could not verifiy
+    if (verifyS != null) { // If could not verifiy
       // Currently bad implementation of cookie, needs to use database/encryption or something to make much more secure and also identifiable for a specific account
       request.response.headers.add("Set-Cookie", verifyS);
       loggedIn = true;
@@ -70,8 +71,13 @@ void handlePost(HttpRequest request) async {
     bool verified = (userID_S != null) ? true : false;
     if (verified) {
       bodyMap["user_id"] = userID_S;
-
-      if (bodyMap["submission"] == "updateTask") {
+      if (bodyMap["submission"] == "getTask") {
+        result = await getTask(bodyMap);
+      }
+      else if (bodyMap["submission"] == "getCategories") {
+        result = await getCategories(bodyMap);
+      }
+      else if (bodyMap["submission"] == "updateTask") {
         updateTask(bodyMap);
       }
       else if (bodyMap["submission"] == "createTask") {
@@ -79,14 +85,17 @@ void handlePost(HttpRequest request) async {
       }
     }
   }
-  request.response.add([]);
+
+  request.response.headers.add("content-type", mimeTypesMap["json"] ?? "application/octet-stream");
+
+  request.response.add(result ?? []);
+
   request.response.close();
   return;
 }
 
 //Helpful resource to developing initial understanding of HttpServer on Dart and approach to its implementation https://dart.dev/tutorials/server/httpserver
 void main() async {
-
   // Create server object with local address and port 800 (note: does not conform to default HTTP port being 80)
   var server = await HttpServer.bind(InternetAddress.anyIPv4, 800);
   print("Opening the following: " + server.address.address.toString());

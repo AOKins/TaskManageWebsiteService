@@ -4,7 +4,7 @@
 var today = new Date();
 // Variable to hold today as a formatted string to use with jsonContent 
 var today_S = today.getFullYear() + "-" + (today.getMonth()+1) + "-" + (today.getDate())
-
+var nextWeek_S = today.getFullYear() + "-" + (today.getMonth()+1) + "-" + (today.getDate()+7);
 // Function to append task to a list
 // Input: listStart - node to start of the list
 //        task - json of the task object needing to be added
@@ -52,7 +52,10 @@ function appendTask(listStart, task) {
 
 // Function to add task content as a JSON file into the main_list 
 // Calls appendTask function for each task
-function outputTasks(jsonContent) {
+function outputTasks(content) {
+    
+    jsonContent = JSON.parse(content);
+    
     // date variable to handle non-today date info neeeded to be stored/accessed as string
     var date;
     // object for list of nodes that are of class "Tasklist"
@@ -63,12 +66,10 @@ function outputTasks(jsonContent) {
     for (list = 0; list < numLists; list++) {
         listOfLists[list].innerHTML="";
         // If the list is for tasks related to today
-        if (listOfLists[list].id == "today") {
+        if (listOfLists[list].id == "today" && jsonContent[today_S] != null) {
             // Use today's date (today_S) as the key
-            if (jsonContent[today_S] != null) {
-                for (task in jsonContent[today_S]) {
-                    appendTask(listOfLists[list], jsonContent[today_S][task]);
-                }    
+            for (task in jsonContent[today_S]) {
+                appendTask(listOfLists[list], jsonContent[today_S][task]);
             }
         }
         else if (listOfLists[list].id == "next2days") {
@@ -76,9 +77,11 @@ function outputTasks(jsonContent) {
             var i;
             for (i = 1; i < 3; i++) {
                 date = today.getFullYear() + "-" + (today.getMonth()+1) + "-" + (today.getDate()+i);
-                for (task in jsonContent[date]) {
-                    appendTask(listOfLists[list], jsonContent[date][task]);
-                }    
+                if (jsonContent[date] != null) {
+                    for (task in jsonContent[date]) {
+                        appendTask(listOfLists[list], jsonContent[date][task]);
+                    }        
+                }
             }
         }
         // For week, does tasks for dates of rest of the week (next 4 days after the next 2)
@@ -86,24 +89,36 @@ function outputTasks(jsonContent) {
             var i;
             for (i = 3; i < 7; i++) {
                 date = today.getFullYear() + "-" + (today.getMonth()+1) + "-" + (today.getDate()+i);
-                for (task in jsonContent[date]) {
-                    appendTask(listOfLists[list], jsonContent[date][task]);
+                if (jsonContent[date] != null) {
+                    for (task in jsonContent[date]) {
+                        appendTask(listOfLists[list], jsonContent[date][task]);
+                    }
                 }
             }
         }
     }
 }
-
 // Script function called when the html body has loaded, handles loading the page's tasks
 async function loadContent()  {
+    var request = "submission=getTask&"
+    request += "startDate=" + today_S;
+    request += "&endDate=" + nextWeek_S;
+
     // Fetch the data and wait for response
-    let data = await fetch(location.protocol + "//" + location.host + '/test_data/test.json');
+    let data = await fetch(location.protocol + "//" + location.host, {
+        method: 'POST',
+        mode: 'cors',
+        headers: {
+            'Content-Type' : 'text/json'
+        },
+        body: request,
+    });
     if (!data.ok) {
         alert("Could not establish connection to server");
     }
     // If received the data okay, call outputTasks with JSON parsing of the content
     else {
-        data.text().then((content) => outputTasks(JSON.parse(content)));
+        data.text().then((content) => outputTasks(content));
     }
 }
 

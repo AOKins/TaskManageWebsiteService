@@ -107,7 +107,7 @@ async function generateCalendar(month, year, jsonContent) {
 // Script function called when the html page has loaded, handles loading the page content
 async function loadContent()  {
     // Default loading is to current month and year    // Fetch the data and wait for response
-    let data = await fetch(location.protocol + "//" + location.host + '/test_data/today.json');
+    let data = await fetch(location.protocol + "//" + location.host + '/test_data/test.json');
     if (!data.ok) {
         alert("Could not establish connection to server");
     }

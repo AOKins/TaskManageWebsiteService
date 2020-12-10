@@ -95,7 +95,7 @@ function appendingCategories(content) {
 
 // A function called onload, gets categories from the server and appends to the form for drop-down selection
 async function getCategories() {
-    var categoryObj = document.getElementById("category");
+/*    var categoryObj = document.getElementById("category");
     if (categoryObj != null) {
         let data = await fetch(location.protocol + "//" + location.host + '/test_data/test.json');
         if (!data.ok) {
@@ -105,5 +105,5 @@ async function getCategories() {
         else {
             data.text().then((content) => appendingCategories(content));
         }
-    }
+    }*/
 }
