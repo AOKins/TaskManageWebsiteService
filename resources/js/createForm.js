@@ -11,6 +11,8 @@ var categoryInput = document.getElementById("category");
 // Node for the form input that allows the user to create new category for their new task
 var categoryText = document.getElementById("categoryText");
 
+var colorSelect = document.getElementById("color");
+
 // True when the form should be visible the client
 var show = false;
 
@@ -66,9 +68,11 @@ if (categoryInput != null) {
         if (categoryInput.value != previousValue) {
             if (categoryInput.value == "*New*") {
                 categoryText.style.display ="inline";
+                colorSelect.style.display ="inline";
             }
             else if (previousValue == "*New*")  {
                 categoryText.style.display ="none";
+                colorSelect.style.display ="none";
             }
         }
         previousValue = categoryInput.value;
@@ -79,17 +83,25 @@ if (categoryInput != null) {
 function appendingCategories(content) {
     var jsonContent = JSON.parse(content);
     
-    var option;
-    for (i in jsonContent.categories) {
-        option = document.createElement("OPTION");
-        option.setAttribute("value", jsonContent.categories[i]);
-        option.innerHTML = jsonContent.categories[i];
-        categoryInput.appendChild(option);
+    var categoryOption;
+    for (i in jsonContent.category_options) {
+        categoryOption = document.createElement("OPTION");
+        categoryOption.setAttribute("value", jsonContent.category_options[i]);
+        categoryOption.innerHTML = jsonContent.category_options[i];
+        categoryInput.appendChild(categoryOption);
     }
-    option = document.createElement("OPTION");
-    option.setAttribute("value", "*New*");
-    option.innerHTML = "*New*";
-    categoryInput.appendChild(option);
+    categoryOption = document.createElement("OPTION");
+    categoryOption.setAttribute("value", "*New*");
+    categoryOption.innerHTML = "*New*";
+    categoryInput.appendChild(categoryOption);
+
+    for (i in jsonContent.color_options) {
+        colorOption = document.createElement("OPTION");
+        colorOption.setAttribute("value", jsonContent.color_options[i]);
+        colorOption.innerHTML = jsonContent.color_options[i];
+        colorSelect.appendChild(colorOption);
+    }
+
 
 }
 

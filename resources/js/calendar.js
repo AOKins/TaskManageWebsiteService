@@ -115,10 +115,8 @@ async function loadContent()  {
     // Set the end border to be the next month's 7thd (7th as a reasonable buffer forward for what could possibly viewed in the calendar's future dates)
     var NextMonthS = ((currentMonth.getMonth()+2) % 12).toString();
     var yearS = currentMonth.getFullYear();
-    if (NextMonthS.length < 2) {
-        NextMonthS = '0' + NextMonthS;
-    }
-    if (NextMonthS == "01") {
+
+    if (NextMonthS == "1") { // If the next month is january, will need to incrmeent the year value for the end (otherwise the end is actually the past!)
         yearS = currentMonth.getFullYear()+1;
     }
     var end_S =  yearS + "-" + NextMonthS + "-07";

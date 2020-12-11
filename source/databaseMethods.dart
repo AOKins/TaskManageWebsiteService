@@ -82,6 +82,7 @@ void updateTask(Map<String,String> inputData) {
 
 void createTask(Map<String,String> inputData) {
     print("New task received to be added");
+    print(inputData.toString());
 }
 
 // Method to getting a task
@@ -91,7 +92,7 @@ Future<List<int>> getTask(Map<String,String> inputData) async {
   String user_id = inputData["user_id"];
   
   String query = "SELECT ID, title, description, dateTime, completion FROM task_manager.task WHERE ownerID=$user_id AND DATE(dateTime) >= '$startRange' AND DATE(dateTime) <= '$endRange' ORDER BY dateTime";
-  print(query);
+
   Map<String, List< Map<String,String>>> content = new Map();
   Results results = await performQueryOnMySQL(query);
 
@@ -120,20 +121,29 @@ Future<List<int>> getTask(Map<String,String> inputData) async {
   });
 
   String jsonContent = json.encode(content);
-  print(jsonContent.toString());
   
   return utf8.encode(jsonContent);
 }
 
 Future<List<int>> getCategories(Map<String,String> inputData) async {
   String userID = inputData["user_id"];
-  String query = "SELECT name, color FROM task_manager.category WHERE ownerID=$userID";
+  String query = "SELECT name FROM task_manager.category WHERE ownerID=$userID";
   Results results = await performQueryOnMySQL(query);
 
   Map<String,List<String>> content = new Map();
-  content["categories"] = new List<String>();
+  content["category_options"] = new List<String>();
+  content["color_options"] = new List<String>();
   results.forEach((row) => {
-    content["categories"].add(
+    content["category_options"].add(
+      row[0],
+    )
+  });
+
+  
+  query = "SELECT color FROM task_manager.color";
+  results = await performQueryOnMySQL(query);
+  results.forEach((row) => {
+    content["color_options"].add(
       row[0],
     )
   });
