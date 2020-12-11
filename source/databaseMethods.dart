@@ -89,10 +89,9 @@ Future<List<int>> getTask(Map<String,String> inputData) async {
   String startRange = inputData["startDate"];
   String endRange = inputData["endDate"];
   String user_id = inputData["user_id"];
-  print("S:$startRange" + "\tE:$endRange" + "\tID:$user_id\n" );
-  //ownerID=$user_id AND 
-  String query = "SELECT ID, title, description, dateTime, completion FROM task_manager.task WHERE DATE(dateTime) >= '$startRange' AND DATE(dateTime) <= '$endRange' ORDER BY dateTime";
-
+  
+  String query = "SELECT ID, title, description, dateTime, completion FROM task_manager.task WHERE ownerID=$user_id AND DATE(dateTime) >= '$startRange' AND DATE(dateTime) <= '$endRange' ORDER BY dateTime";
+  print(query);
   Map<String, List< Map<String,String>>> content = new Map();
   Results results = await performQueryOnMySQL(query);
 
@@ -105,7 +104,7 @@ Future<List<int>> getTask(Map<String,String> inputData) async {
     date = dateTime.substring(0, dateTime.indexOf(' ') ),
 
     // If this date does not point to a list (first row with this date), then set to new list
-    content[date] ??= new List(),
+    content[date] ??= new List<Map<String,String>>(),
 
     // Using this row's data, append a new map to the list
     content[date].add(
@@ -120,21 +119,24 @@ Future<List<int>> getTask(Map<String,String> inputData) async {
     )
   });
 
-
   String jsonContent = json.encode(content);
-  print(jsonContent);
+  print(jsonContent.toString());
   
   return utf8.encode(jsonContent);
 }
 
 Future<List<int>> getCategories(Map<String,String> inputData) async {
   String userID = inputData["user_id"];
-  String query = "SELECT * FROM task_manager.categories, task_manager.user WHERE task_manager.categories.ownerID = $userID";
+  String query = "SELECT name, color FROM task_manager.category WHERE ownerID=$userID";
   Results results = await performQueryOnMySQL(query);
-  var row;
-  print("getting cats");
-  for (row in results) {
-    print(row[0].toString());
-  }
 
+  Map<String,List<String>> content = new Map();
+  content["categories"] = new List<String>();
+  results.forEach((row) => {
+    content["categories"].add(
+      row[0],
+    )
+  });
+  // Return the content encoded first into json structure, then into uft8 for response body
+  return utf8.encode(json.encode(content));
 }

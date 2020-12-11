@@ -95,15 +95,22 @@ function appendingCategories(content) {
 
 // A function called onload, gets categories from the server and appends to the form for drop-down selection
 async function getCategories() {
-/*    var categoryObj = document.getElementById("category");
-    if (categoryObj != null) {
-        let data = await fetch(location.protocol + "//" + location.host + '/test_data/test.json');
-        if (!data.ok) {
-            alert("Could not establish connection to server for category data");
-        }
-        // If received the data okay, call outputTasks with JSON parsing of the content
-        else {
-            data.text().then((content) => appendingCategories(content));
-        }
-    }*/
+    var request = "submission=getCategories";
+
+    // Fetch the data and wait for response
+    let data = await fetch(location.protocol + "//" + location.host, {
+        method: 'POST',
+        mode: 'cors',
+        headers: {
+            'Content-Type' : 'text/json'
+        },
+        body: request,
+    });
+    if (!data.ok) {
+        alert("Could not establish connection to server");
+    }
+    // If received the data okay, call outputTasks with JSON parsing of the content
+    else {
+        data.text().then((content) => appendingCategories(content));
+    }
 }

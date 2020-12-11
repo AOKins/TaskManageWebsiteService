@@ -100,7 +100,7 @@ function outputTasks(content) {
 }
 // Script function called when the html body has loaded, handles loading the page's tasks
 async function loadContent()  {
-    var request = "submission=getTask&"
+    var request = "submission=getTask&";
     request += "startDate=" + today_S;
     request += "&endDate=" + nextWeek_S;
 

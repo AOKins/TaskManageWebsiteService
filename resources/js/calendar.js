@@ -20,11 +20,14 @@ function loadTasksForDate(node, date, jsonData) {
     var outputCount = 0;
     // Iterate through each task associated with the date, appending just the title as a list item into the date box
     for (task in jsonData[dateS]) {
-        if (jsonData[dateS][task].checked == false) {
             if (outputCount < 4) {
                 listItem = document.createElement("LI");
                 listItem.appendChild(document.createTextNode(jsonData[dateS][task].title));
-                node.appendChild(listItem);    
+                if (jsonData[dateS][task].checked == "true") {
+                    listItem.style.display = "none"; // Hide in date object this task (but kept in for date selection the data isn't lost)
+                }
+
+                node.appendChild(listItem);
             }
             else if (outputCount == 4) {
                 listItem = document.createElement("LI");
@@ -35,14 +38,14 @@ function loadTasksForDate(node, date, jsonData) {
                 break;
             }
             outputCount++;
-        }
     }
     
 }
 
-async function generateCalendar(month, year, jsonContent) {
+async function generateCalendar(month, year, content) {
     // Fetch the data and wait for response
         // First empty the Nodes of children if they are not empty
+    jsonContent = JSON.parse(content);
     monthTag.innerHTML = '';
     yearTag.innerHTML = '';
     datesObj.innerHTML = '';
@@ -106,14 +109,36 @@ async function generateCalendar(month, year, jsonContent) {
 
 // Script function called when the html page has loaded, handles loading the page content
 async function loadContent()  {
-    // Default loading is to current month and year    // Fetch the data and wait for response
-    let data = await fetch(location.protocol + "//" + location.host + '/test_data/test.json');
+    var request = "submission=getTask&";
+    // Set the start border to be the previous month's 22nd (22nd as a reasonable buffer back for what could possibly viewed in the calendar's previous dates)
+    var start_S = currentMonth.getFullYear() +"-"+ (currentMonth.getMonth()) + "-22";
+    // Set the end border to be the next month's 7thd (7th as a reasonable buffer forward for what could possibly viewed in the calendar's future dates)
+    var NextMonthS = ((currentMonth.getMonth()+2) % 12).toString();
+    var yearS = currentMonth.getFullYear();
+    if (NextMonthS.length < 2) {
+        NextMonthS = '0' + NextMonthS;
+    }
+    if (NextMonthS == "01") {
+        yearS = currentMonth.getFullYear()+1;
+    }
+    var end_S =  yearS + "-" + NextMonthS + "-07";
+    request += "startDate=" + start_S;
+    request += "&endDate=" + end_S;
+    // Fetch the data and wait for response
+    let data = await fetch(location.protocol + "//" + location.host, {
+        method: 'POST',
+        mode: 'cors',
+        headers: {
+            'Content-Type' : 'text/json'
+        },
+        body: request,
+    });
     if (!data.ok) {
         alert("Could not establish connection to server");
     }
     // If received the data okay, call outputTasks with JSON parsing of the content
     else {
-        data.text().then((content) => generateCalendar(currentMonth.getMonth(), currentMonth.getFullYear(), JSON.parse(content)));
+        data.text().then((content) => generateCalendar(currentMonth.getMonth(), currentMonth.getFullYear(), content));
     }
 }
 
