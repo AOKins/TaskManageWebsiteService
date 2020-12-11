@@ -2,6 +2,8 @@ import 'dart:io';
 
 // Takes in an inputted body and converts into a map
 // '&' seperates pairs, '=' for (key,value)
+// Input: string containing variables to parse through
+// Output: Map equivalent of inputted string with variable names as keys
 Map<String,String> convertBody(String input) {
   List<int> ampIndexes = [];  // List to store the indexes where the & are
   List<int> equIndexes = [];  // List to store the indexes where the = are

@@ -4,6 +4,7 @@ body {
     font-family: Tahoma, arial;
 }
 
+/*Style for the navbar on left side of window*/
 nav {
     position: fixed;
     width: 180px;
@@ -53,8 +54,9 @@ nav ul li a {
 nav ul li a:hover {
     background-color: green;
 }
+/* End of Nav Bar */
 
-
+/*Style for create task form*/
 #createForm {
     position: fixed;
     left:40vw;

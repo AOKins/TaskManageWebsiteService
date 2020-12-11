@@ -44,6 +44,7 @@ ul.Tasklist {
     padding-left: 0px;
 }
 
+/* CSS styling for tasks themselves */
 .task {
     margin-top: 20px;
     background-color: aqua;
