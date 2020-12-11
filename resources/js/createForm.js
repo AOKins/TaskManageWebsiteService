@@ -86,8 +86,8 @@ function appendingCategories(content) {
     var categoryOption;
     for (i in jsonContent.category_options) {
         categoryOption = document.createElement("OPTION");
-        categoryOption.setAttribute("value", jsonContent.category_options[i]);
-        categoryOption.innerHTML = jsonContent.category_options[i];
+        categoryOption.setAttribute("value", jsonContent.category_options[i].id); // The value is the category's associated ID
+        categoryOption.innerHTML = jsonContent.category_options[i].name;
         categoryInput.appendChild(categoryOption);
     }
     categoryOption = document.createElement("OPTION");
@@ -97,8 +97,8 @@ function appendingCategories(content) {
 
     for (i in jsonContent.color_options) {
         colorOption = document.createElement("OPTION");
-        colorOption.setAttribute("value", jsonContent.color_options[i]);
-        colorOption.innerHTML = jsonContent.color_options[i];
+        colorOption.setAttribute("value", jsonContent.color_options[i].option);
+        colorOption.innerHTML = jsonContent.color_options[i].option;
         colorSelect.appendChild(colorOption);
     }
 

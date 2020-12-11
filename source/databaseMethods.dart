@@ -41,7 +41,7 @@ Future<String> verifyCookieAccess(List<String> cookies) async {
   // Finally, close the connection
   if (cookies.length != null) {
     for (int i = 0; i < cookies.length; i++) {
-      var results = await performQueryOnMySQL('SELECT COUNT(*) FROM task_manager.user WHERE ID = ' + cookies[i]);
+      var results = await performQueryOnMySQL('SELECT COUNT(*) FROM user WHERE ID = ' + cookies[i]);
       // Like verifyLoginCred, this is a hard coded bad method that needs to be replaced with usage of the database
       for (var row in results) {
         if (row[0] > 0) {
@@ -57,7 +57,7 @@ Future<String> verifyCookieAccess(List<String> cookies) async {
 // Method to determine if a user attempting to login has the correct username and password
 // Requires query to database for id that matches given username and password
 Future<String> verifyLoginCred(String givenUser, String givenPass) async {
-  String query = "SELECT ID FROM task_manager.user WHERE username = '$givenUser' AND password='$givenPass'";  
+  String query = "SELECT ID FROM user WHERE username = '$givenUser' AND password='$givenPass'";  
   var results = await performQueryOnMySQL(query);
   for (var row in results) {
     if (row[0] != 0) {
@@ -76,13 +76,58 @@ void updateTask(Map<String,String> inputData) {
     completion = (inputData["completion"] == "true") ? 1 : 0;
   }
   var taskID = inputData["task_id"];
-  query = "UPDATE task_manager.task SET completion = $completion WHERE ID=$taskID";
+  query = "UPDATE task SET completion = $completion WHERE ID=$taskID";
   performQueryOnMySQL(query);
 }
 
-void createTask(Map<String,String> inputData) {
-    print("New task received to be added");
-    print(inputData.toString());
+
+// Insert a new category into the DBMS
+Future<String> createCategory(String owner, String name, String color) async {
+  String query;
+  print("inserting");
+  query = "INSERT INTO category (ownerID, name, color) VALUES ($owner, '$name', '$color')";
+  performQueryOnMySQL(query);
+  print("getting..");
+
+  query = "SELECT ID FROM category WHERE ownerID=$owner AND name='$name'";
+  print(query);
+  Results results = await performQueryOnMySQL(query);
+
+  String value;
+  value = results.first[0].toString();
+
+  return value;
+}
+
+Future<String> getCategoryID(String owner, String name) async {
+  String query, value;
+  query = "SELECT ID FROM category WHERE ownerID=$owner AND name='$name'";
+
+  Results results = await performQueryOnMySQL(query);
+
+  value = results.first[0].toString();
+  return value;
+}
+
+
+void createTask(Map<String,String> inputData) async {
+  // If a new category was created with this task, must first create the category before createing 
+    String id;
+    if (inputData["category"] == "*New*") {
+      print("Creating new category");
+      id = await createCategory(inputData["user_id"], inputData["categoryText"], inputData["color"]);
+    }
+    else {
+      id = inputData["category"];
+    }
+    String dueTime = inputData["due_date"] + " " + inputData["due_time"];
+    dueTime = dueTime.trim();
+
+    String query = "INSERT INTO task_manager.task (title,description,dateTime,ownerID,categoryID) ";
+    query += "VALUES ('" + inputData["title"] + "','" + inputData["desc"] + "', '$dueTime:00'," + inputData["user_id"] + ",$id)";
+    print(query);
+    performQueryOnMySQL(query);
+
 }
 
 // Method to getting a task
@@ -127,16 +172,18 @@ Future<List<int>> getTask(Map<String,String> inputData) async {
 
 Future<List<int>> getCategories(Map<String,String> inputData) async {
   String userID = inputData["user_id"];
-  String query = "SELECT name FROM task_manager.category WHERE ownerID=$userID";
+  String query = "SELECT id, name FROM task_manager.category WHERE ownerID=$userID";
   Results results = await performQueryOnMySQL(query);
 
-  Map<String,List<String>> content = new Map();
-  content["category_options"] = new List<String>();
-  content["color_options"] = new List<String>();
+  Map<String,List<Map<String,String>>> content = new Map();
+  content["category_options"] = new List<Map<String,String>>();
+  content["color_options"] = new List<Map<String,String>>();
   results.forEach((row) => {
     content["category_options"].add(
-      row[0],
-    )
+    {
+      "id" : row[0].toString(),
+      "name" : row[1].toString(),
+    })
   });
 
   
@@ -144,7 +191,9 @@ Future<List<int>> getCategories(Map<String,String> inputData) async {
   results = await performQueryOnMySQL(query);
   results.forEach((row) => {
     content["color_options"].add(
-      row[0],
+      {
+      "option": row[0],
+    }
     )
   });
   // Return the content encoded first into json structure, then into uft8 for response body
