@@ -78,11 +78,3 @@ nav ul li a:hover {
     left: 0px;
     width: 100%;
 }
-
-#createForm #categoryText {
-    display: none;
-}
-
-#createForm #color {
-    display: none;
-}

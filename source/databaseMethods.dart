@@ -84,31 +84,19 @@ void updateTask(Map<String,String> inputData) {
 // Insert a new category into the DBMS
 Future<String> createCategory(String owner, String name, String color) async {
   String query;
-  print("inserting");
   query = "INSERT INTO category (ownerID, name, color) VALUES ($owner, '$name', '$color')";
-  performQueryOnMySQL(query);
-  print("getting..");
-
-  query = "SELECT ID FROM category WHERE ownerID=$owner AND name='$name'";
   print(query);
-  Results results = await performQueryOnMySQL(query);
-
-  String value;
-  value = results.first[0].toString();
-
-  return value;
-}
-
-Future<String> getCategoryID(String owner, String name) async {
-  String query, value;
+  await performQueryOnMySQL(query);
+  
   query = "SELECT ID FROM category WHERE ownerID=$owner AND name='$name'";
 
+  print(query);;
   Results results = await performQueryOnMySQL(query);
 
-  value = results.first[0].toString();
-  return value;
+  for (var value in results) {
+    return value[0].toString();
+  }
 }
-
 
 void createTask(Map<String,String> inputData) async {
   // If a new category was created with this task, must first create the category before createing 

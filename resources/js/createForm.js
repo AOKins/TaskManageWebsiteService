@@ -58,6 +58,7 @@ if (formObj != null && form != null) {
     
         // Call loadContent() (assumed to be in another javascript file for the respective page this is attached to)
         loadContent();
+        getCategories(); // Refresh categories
     });
 }
 
@@ -82,19 +83,24 @@ if (categoryInput != null) {
 // Function for adding categories into categoryInput tag for create Task form
 function appendingCategories(content) {
     var jsonContent = JSON.parse(content);
-    
+
+    categoryInput.innerHTML = "";
+    colorSelect.innerHTML = "";
+
     var categoryOption;
-    for (i in jsonContent.category_options) {
-        categoryOption = document.createElement("OPTION");
-        categoryOption.setAttribute("value", jsonContent.category_options[i].id); // The value is the category's associated ID
-        categoryOption.innerHTML = jsonContent.category_options[i].name;
-        categoryInput.appendChild(categoryOption);
-    }
+    // Set new category to top
     categoryOption = document.createElement("OPTION");
     categoryOption.setAttribute("value", "*New*");
     categoryOption.innerHTML = "*New*";
     categoryInput.appendChild(categoryOption);
-
+    // Append previous categories created
+    for (i in jsonContent.category_options) {
+        categoryOption = document.createElement("OPTION");
+        categoryOption.setAttribute("value", jsonContent.category_options[jsonContent.category_options.length-1 - i].id); // The value is the category's associated ID
+        categoryOption.innerHTML = jsonContent.category_options[jsonContent.category_options.length-1 - i].name;
+        categoryInput.appendChild(categoryOption);
+    }
+    // Setting the available colors according to what the response contains
     for (i in jsonContent.color_options) {
         colorOption = document.createElement("OPTION");
         colorOption.setAttribute("value", jsonContent.color_options[i].option);
