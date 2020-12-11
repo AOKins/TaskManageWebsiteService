@@ -1,5 +1,4 @@
 import 'dart:convert';
-
 import 'package:mysql1/mysql1.dart'; // For connecting into MySQL
 
 // A simple handler to return results of a query from the task_manager database
@@ -76,7 +75,8 @@ void updateTask(Map<String,String> inputData) {
     completion = (inputData["completion"] == "true") ? 1 : 0;
   }
   var taskID = inputData["task_id"];
-  query = "UPDATE task SET completion = $completion WHERE ID=$taskID";
+  query = "UPDATE task SET completion=$completion WHERE ID=$taskID;";
+  print(query);
   performQueryOnMySQL(query);
 }
 
@@ -99,13 +99,13 @@ Future<String> createCategory(String owner, String name, String color) async {
 }
 
 void createTask(Map<String,String> inputData) async {
-  // If a new category was created with this task, must first create the category before createing 
     String id;
+    // If a new category was created with this task, must first create the category before getting id 
     if (inputData["category"] == "*New*") {
-      print("Creating new category");
       id = await createCategory(inputData["user_id"], inputData["categoryText"], inputData["color"]);
     }
     else {
+    // If not a new category, then "category" key should hold the id
       id = inputData["category"];
     }
     String dueTime = inputData["due_date"] + " " + inputData["due_time"];
@@ -113,7 +113,6 @@ void createTask(Map<String,String> inputData) async {
 
     String query = "INSERT INTO task_manager.task (title,description,dateTime,ownerID,categoryID) ";
     query += "VALUES ('" + inputData["title"] + "','" + inputData["desc"] + "', '$dueTime:00'," + inputData["user_id"] + ",$id)";
-    print(query);
     performQueryOnMySQL(query);
 
 }
@@ -129,12 +128,11 @@ Future<List<int>> getTask(Map<String,String> inputData) async {
   Map<String, List< Map<String,String>>> content = new Map();
   Results results = await performQueryOnMySQL(query);
 
-  String dateTime, date, time;// temp holder for a row's dateTime
+  String dateTime, date;// temp holder for a row's dateTime
   // For each row, append into the content map the row's data as a adding on the list a new map
   results.forEach((row) => {
     // Get the time and date seperately
     dateTime = row[3].toString(),
-    time = dateTime.substring(dateTime.indexOf(' ') + 1),
     date = dateTime.substring(0, dateTime.indexOf(' ') ),
 
     // If this date does not point to a list (first row with this date), then set to new list
@@ -146,8 +144,7 @@ Future<List<int>> getTask(Map<String,String> inputData) async {
         "task_id": row[0].toString(),
         "title" : row[1].toString(),
         "desc" : row[2].toString(),
-        "date" : date,
-        "due" : time,
+        "dateTime" : dateTime,
         "checked" : row[4] == 0 ? "false" : "true",
       }
     )
@@ -159,13 +156,14 @@ Future<List<int>> getTask(Map<String,String> inputData) async {
 }
 
 Future<List<int>> getCategories(Map<String,String> inputData) async {
+
   String userID = inputData["user_id"];
   String query = "SELECT id, name FROM task_manager.category WHERE ownerID=$userID";
   Results results = await performQueryOnMySQL(query);
 
   Map<String,List<Map<String,String>>> content = new Map();
-  content["category_options"] = new List<Map<String,String>>();
-  content["color_options"] = new List<Map<String,String>>();
+
+  content["category_options"] ??= new List<Map<String,String>>();
   results.forEach((row) => {
     content["category_options"].add(
     {
@@ -174,15 +172,15 @@ Future<List<int>> getCategories(Map<String,String> inputData) async {
     })
   });
 
-  
+  content["color_options"] ??= new List<Map<String,String>>();
   query = "SELECT color FROM task_manager.color";
   results = await performQueryOnMySQL(query);
+
   results.forEach((row) => {
     content["color_options"].add(
-      {
+    {
       "option": row[0],
-    }
-    )
+    })
   });
   // Return the content encoded first into json structure, then into uft8 for response body
   return utf8.encode(json.encode(content));

@@ -75,6 +75,6 @@ ul.Tasklist {
     top: 10px;
 }
 
-.task.false {
+.task.true {
     background-color: grey;
 }
