@@ -76,7 +76,6 @@ void updateTask(Map<String,String> inputData) {
   }
   var taskID = inputData["task_id"];
   query = "UPDATE task SET completion=$completion WHERE ID=$taskID;";
-  print(query);
   performQueryOnMySQL(query);
 }
 
@@ -85,12 +84,9 @@ void updateTask(Map<String,String> inputData) {
 Future<String> createCategory(String owner, String name, String color) async {
   String query;
   query = "INSERT INTO category (ownerID, name, color) VALUES ($owner, '$name', '$color')";
-  print(query);
   await performQueryOnMySQL(query);
   
   query = "SELECT ID FROM category WHERE ownerID=$owner AND name='$name'";
-
-  print(query);;
   Results results = await performQueryOnMySQL(query);
 
   for (var value in results) {
