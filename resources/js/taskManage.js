@@ -42,11 +42,6 @@ function appendTask(listStart, task) {
     // Id is equal to the id of the task in the database
     taskContainer.setAttribute("id", task.task_id);
 
-
-
-
-
-
     // Appending button task container which requires task id value to identify the task 
     var taskPart = document.createElement("BUTTON");
     taskPart.setAttribute("label", "check");

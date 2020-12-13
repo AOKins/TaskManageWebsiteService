@@ -21,9 +21,9 @@
         <div id="createForm">
             <form id="createTask" method="POST">
                 <input type="text" id="title" name="title" placeholder="Task Title" required><br>
-                <textarea id="desc" name="desc" placeholder="Task Description" rows="4" cols="40"></textarea><br>
+                <textarea id="desc" name="desc" placeholder="Task Description" rows="6" cols="37" maxlength="255"></textarea><br>
                 <select id="category" name="category" required></select>
-                <input type="text" id="categoryText" name="categoryText" placeholder="New Category">
+                <input type="text" id="categoryText" name="categoryText" placeholder="New Category" maxlength="255">
                 <select id="color" name="color"></select>
                 <br>
                 <input type="date" name="due_date" id="due_date"  required>
