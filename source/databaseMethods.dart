@@ -238,3 +238,14 @@ Future<String> attemptCreateUser(Map<String,String> inputData) async {
   }
 
 }
+
+// Method to handle deleting a task, given task id within inputData
+// Permission assumed granted
+void deleteTask(Map<String,String> inputData) {
+  String query;
+  String delete_id = inputData["task_id"];
+  query = "DELETE FROM task_manager.task WHERE ID=$delete_id";
+
+  performQueryOnMySQL(query);
+
+}

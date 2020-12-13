@@ -103,11 +103,14 @@ void handlePost(HttpRequest request) async {
       else if (bodyMap["submission"] == "createTask") {
         createTask(bodyMap);
       }
+      else if (bodyMap["submission"] == "deleteTask") {
+        deleteTask(bodyMap);
+      }
     }
   }
   // Set mime type to json for results, if the map is null (not defined) default to application/octet-stream
   request.response.headers.add("content-type", mimeTypesMap["json"] ?? "application/octet-stream");
   // If result is null than add an empty list
-  request.response.add(result);
+  request.response.add(result ?? []);
   request.response.close();
 }

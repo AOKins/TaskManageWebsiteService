@@ -51,9 +51,19 @@ ul.Tasklist {
 
 }
 
-.task button {
+.task button.check {
     height: 20px;
     width: 20px;
+}
+
+.task button.delete {
+    display: inline;
+    position: relative;
+    top: -30px;
+    left: 97%;
+    height: 18px;
+    width: 18px;
+    z-index: 2;
 }
 
 .task #title {

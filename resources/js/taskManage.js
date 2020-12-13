@@ -74,6 +74,14 @@ function appendTask(listStart, task) {
         taskPart.setAttribute("id", "shareTag");
         taskContainer.appendChild(taskPart);
     }
+    // If not a shared task, append an option for deleting the task 
+    else if (task.shared != "true") {
+        taskPart = document.createElement("BUTTON");
+        taskPart.setAttribute("label", "delete");
+        taskPart.setAttribute("class", "delete");
+        taskPart.setAttribute("onclick", "deleteTaskHandler(" + task.task_id + ")")
+        taskContainer.appendChild(taskPart);    
+    }
 
     taskContainer.appendChild(document.createElement("br"));
 
@@ -185,4 +193,17 @@ function taskCompletionHandler(id) {
     myRequest.setRequestHeader("Content-type", "text/plain");
     myRequest.send("submission=updateTask&task_id=" + id + "&completion=" + task_complete);
     // Assuming no need for response (change done locally prior)
+}
+
+
+function deleteTaskHandler(id) {
+    var this_task = document.getElementById(id);
+    // Remove this task from the document
+    this_task.parentNode.removeChild(this_task);
+
+    // Update the database's task data using a POST request, not expecting a response
+    var myRequest = new XMLHttpRequest();
+    myRequest.open("POST", "/", true);
+    myRequest.setRequestHeader("Content-type", "text/plain");
+    myRequest.send("submission=deleteTask&task_id=" + id);
 }
