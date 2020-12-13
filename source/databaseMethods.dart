@@ -78,12 +78,12 @@ void updateTask(Map<String,String> inputData) {
   int completion = 0;
   // Get the completion value
   if (inputData["completion"] != null ) {
+    // Get the id of the task and setup/perform the query
     completion = (inputData["completion"] == "true") ? 1 : 0;
+    var taskID = inputData["task_id"];
+    query = "UPDATE task SET completion=$completion WHERE ID=$taskID;";
+    performQueryOnMySQL(query);
   }
-  // Get the id of the task and setup/perform the query
-  var taskID = inputData["task_id"];
-  query = "UPDATE task SET completion=$completion WHERE ID=$taskID;";
-  performQueryOnMySQL(query);
 }
 
 // Insert a new category into the DBMS
@@ -120,8 +120,8 @@ void createTask(Map<String,String> inputData) async {
     // Trim to remove spaces from ends if they exist 
     dueTime = dueTime.trim();
     // Generate query and perform
-    String query = "INSERT INTO task_manager.task (title,description,dateTime,ownerID,categoryID) ";
-    query += "VALUES ('" + inputData["title"] + "','" + inputData["desc"] + "', '$dueTime:00'," + inputData["user_id"] + ",$id)";
+    String query = "INSERT INTO task_manager.task (title,description,dateTime,ownerID,categoryID, completion, recurringID) ";
+    query += "VALUES ('" + inputData["title"] + "','" + inputData["desc"] + "', '$dueTime:00'," + inputData["user_id"] + ",$id, 0, 0)";
     performQueryOnMySQL(query);
 
 }
@@ -135,8 +135,13 @@ Future<List<int>> getTask(Map<String,String> inputData) async {
   String endRange = inputData["endDate"];
   String user_id = inputData["user_id"];
   
-  String query = "SELECT ID, title, description, dateTime, completion FROM task_manager.task WHERE ownerID=$user_id AND DATE(dateTime) >= '$startRange' AND DATE(dateTime) <= '$endRange' ORDER BY dateTime";
-
+  String query = "";
+  // Generating the query to get all tasks for a user in given time range, includes shared tasks and category info
+  query += "SELECT taskID, taskTitle, taskDesc, dateTime, completion, category.name as categoryName, category.color as color, user.username, allTasks.ownerID ";
+  query += "FROM (SELECT DISTINCT ID as taskID, title as taskTitle, description as taskDesc, dateTime, completion, task.categoryID as categoryID, task.ownerID as ownerID ";
+	query += "FROM task, share ";
+	query += "WHERE (share.userID = $user_id AND task.categoryID = share.categoryID) OR task.ownerID = $user_id  AND DATE(dateTime) >= '$startRange' AND DATE(dateTime) <= '$endRange') as allTasks, category, user ";
+  query += "WHERE category.ID = allTasks.categoryID and user.id = allTasks.ownerID ORDER BY dateTime;";
   // Create a map to a list of Maps, use date as key to list of task info in the form of maps
   Map<String, List< Map<String,String>>> content = new Map();
   Results results = await performQueryOnMySQL(query);
@@ -144,7 +149,7 @@ Future<List<int>> getTask(Map<String,String> inputData) async {
   String dateTime, date;// temp holder for a row's dateTime
   // For each row, append into the content map the row's data as a adding on the list a new map
   results.forEach((row) => {
-    // Get the time and date seperately
+    // Get a string of date only to use for key
     dateTime = row[3].toString(),
     date = dateTime.substring(0, dateTime.indexOf(' ') ),
 
@@ -158,7 +163,11 @@ Future<List<int>> getTask(Map<String,String> inputData) async {
         "title" : row[1].toString(),
         "desc" : row[2].toString(),
         "dateTime" : dateTime,
-        "checked" : row[4] == 0 ? "false" : "true",
+        "completed" : row[4] == 0 ? "false" : "true",
+        "categoryName" : row[5],
+        "color" : row[6],
+        "ownerName" : row[7],
+        "shared" : row[8].toString() != user_id ? "true" : "false", // A seperate attribute dervied from comparing the ownerID of the task to the user's and returning true if not the same
       }
     )
   });
@@ -201,4 +210,31 @@ Future<List<int>> getCategories(Map<String,String> inputData) async {
   });
   // Return the content encoded first into json structure, then into uft8 for response body
   return utf8.encode(json.encode(content));
+}
+
+// Attempt to create a new user using provided username and password in inputData, returns failure response if not successful from DBMS
+// Input: username and password string values from inputData map
+// Output: If successful (new user created in dbms) returns resulting id as a string, if not succesful (something such as username is a duplicate) returns null
+Future<String> attemptCreateUser(Map<String,String> inputData) async {
+  String query;
+  String username = inputData["username"];
+  String password = inputData["password"];
+
+  query = "INSERT INTO task_manager.user (username, password) VALUES ('$username' , '$password')";
+  try {
+    // Attempt to create user
+    await performQueryOnMySQL(query);
+
+    // No error so succesful creation! Now get the resulting id to return     
+    query = "SELECT ID FROM task_manager.user WHERE username='$username' AND password='$password'";
+    
+    Results results = await performQueryOnMySQL(query); 
+    
+    return results.first[0].toString();
+  }
+  catch (e) {
+    print("ERROR $e");
+    return null;
+  }
+
 }

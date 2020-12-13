@@ -49,7 +49,6 @@ void handleGet(HttpRequest request, bool loginThruPost) async {
 void handlePost(HttpRequest request) async {
   // Get body of Post message from request as a map
   Map<String,String> bodyMap = convertBody(await utf8.decodeStream(request));
-  
   bool loggedIn = false;
 
   List<int> result;
@@ -65,9 +64,27 @@ void handlePost(HttpRequest request) async {
     // Have handleGet perform the resulting body content for home.html
     return handleGet(request, loggedIn);
   }
+  else if (bodyMap["submission"] == "createUser") {
+    String id = await attemptCreateUser(bodyMap);
+    if (id != null) {
+      request.response.headers.add("Set-Cookie", id);
+      result = utf8.encode("result=success");
+    }
+    else {
+      result = utf8.encode("result=failure");
+    }
+  }
   else {
     // If not logging in (currently no way to sign up), then they must have a cookie that identifies them so try and get it
-    String userID_S = await verifyCookieAccess(request.headers["Cookie"] as List<String>);
+    String userID_S;
+    try {
+      userID_S = await verifyCookieAccess(request.headers["Cookie"] as List<String>);
+    }
+    catch (e) {
+      print(e);
+      request.response.close();
+      return;
+    }
     // Add the id to the map
     bodyMap["user_id"] = userID_S;
     // Determine if verified or not by checking the string before checking submission 
@@ -91,6 +108,6 @@ void handlePost(HttpRequest request) async {
   // Set mime type to json for results, if the map is null (not defined) default to application/octet-stream
   request.response.headers.add("content-type", mimeTypesMap["json"] ?? "application/octet-stream");
   // If result is null than add an empty list
-  request.response.add(result ?? []);
+  request.response.add(result);
   request.response.close();
 }

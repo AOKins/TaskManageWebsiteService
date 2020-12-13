@@ -25,16 +25,33 @@ function appendTask(listStart, task) {
     // Create element that is to contain the task
     var taskContainer = document.createElement("LI");
     
-    taskContainer.setAttribute("class", "task " + task.checked);
+    taskContainer.setAttribute("class", "task");
+    taskContainer.setAttribute("shared", task.shared);
+    taskContainer.setAttribute("category", task.categoryName);
+    taskContainer.setAttribute("completed", task.completed);
+    // Store what the color of the task is in both an attribute for access and assign to style if not completed
+    taskContainer.setAttribute("categoryColor", task.color);
+
+    if (task.completed == "true") {
+        taskContainer.style.backgroundColor = "grey";
+    }
+    else {
+        taskContainer.style.backgroundColor = task.color;
+    }
 
     // Id is equal to the id of the task in the database
     taskContainer.setAttribute("id", task.task_id);
+
+
+
+
+
 
     // Appending button task container which requires task id value to identify the task 
     var taskPart = document.createElement("BUTTON");
     taskPart.setAttribute("label", "check");
     taskPart.setAttribute("class", "check");
-    taskPart.setAttribute("onclick", "taskButtonHandler(" + task.task_id + ")")
+    taskPart.setAttribute("onclick", "taskCompletionHandler(" + task.task_id + ")")
     taskContainer.appendChild(taskPart);
 
     // Appending title to task object
@@ -55,12 +72,21 @@ function appendTask(listStart, task) {
     }
     taskContainer.appendChild(taskPart);
 
+    // If shared, append an element that states who the owner is
+    if (task.shared == "true") {
+        taskPart = document.createElement("DiV");
+        taskPart.innerHTML = ("Shared by " + task.ownerName);
+        taskPart.setAttribute("id", "shareTag");
+        taskContainer.appendChild(taskPart);
+    }
+
+    taskContainer.appendChild(document.createElement("br"));
+
     taskPart = document.createElement("DIV");
     taskPart.setAttribute("id", "description");
     taskPart.appendChild(document.createTextNode(task.desc));
     taskContainer.appendChild(taskPart);
 
-    // To be added taskContainer.style.color = task.color;
 
     // Appending the task to the list
     listStart.appendChild(taskContainer);
@@ -130,10 +156,6 @@ async function loadContent()  {
     // Fetch the data and wait for response
     let data = await fetch(location.protocol + "//" + location.host, {
         method: 'POST',
-        mode: 'cors',
-        headers: {
-            'Content-Type' : 'text/json'
-        },
         body: request,
     });
     if (!data.ok) {
@@ -146,23 +168,26 @@ async function loadContent()  {
 }
 
 // Function to handle the event of a task's button being called, argument is the task's id value
-function taskButtonHandler(id) {
+function taskCompletionHandler(id) {
     // Get Node for task with id to identify its status
     var this_task = document.getElementById(id);
-    var task_checked = !this_task.classList.contains("true");
+    var task_complete = this_task.getAttribute("completed");
+    var task_color = this_task.getAttribute("categoryColor");
+
     // Update locally the task's status by updating its attribute
-    this_task.setAttribute("class", "task");
-    if (task_checked) {
-        this_task.classList.add("true");
+    if (task_complete=="false") {
+        task_complete = "true";
+        this_task.style.backgroundColor = "grey";
     }
     else {
-        this_task.classList.add("false");
+        task_complete = "false";
+        this_task.style.backgroundColor = task_color;
     }
 
     // Update the database's task data using a POST request
     var myRequest = new XMLHttpRequest();
     myRequest.open("POST", "/", true);
     myRequest.setRequestHeader("Content-type", "text/plain");
-    myRequest.send("submission=updateTask&task_id=" + id + "&completion=" + task_checked);
+    myRequest.send("submission=updateTask&task_id=" + id + "&completion=" + task_complete);
     // Assuming no need for response (change done locally prior)
 }

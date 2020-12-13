@@ -1,6 +1,5 @@
 // Javascript file to hold behavior related to the create Task form
 
-
 // Node for createTask form identified by id "createTask"
 var form = document.getElementById("createTask");
 
@@ -131,10 +130,6 @@ async function getCategories() {
     // Fetch the data and wait for response
     let data = await fetch(location.protocol + "//" + location.host, {
         method: 'POST',
-        mode: 'cors',
-        headers: {
-            'Content-Type' : 'text/json'
-        },
         body: request,
     });
     if (!data.ok) {
