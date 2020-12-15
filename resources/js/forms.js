@@ -40,10 +40,10 @@ if (createFormObj != null && createForm != null) {
         // Make sure to initialize s_content to empty string before adding anything
         s_content = "";
         var dateSubmit, date, time;
-        for (i = 0; i < form.length-1; i++) {
+        for (i = 0; i < createForm.length-1; i++) {
             // Add this input field's content, using id to identify the variable being set
             if (createForm[i].id == "due_date") {
-                date = createFrom[i].value;
+                date = createForm[i].value;
             }
             else if (createForm[i].id == "due_time" ) {
                 time = createForm[i].value;
@@ -57,49 +57,15 @@ if (createFormObj != null && createForm != null) {
             }
         }
 
-        dateSubmit = new Date(date + " " + time);
-        // Convert the submission into UTC timezone        
-        var dateString = dateSubmit.getUTCFullYear()+"-";
         
-        if (dateSubmit.getMonth()+1 < 10) {
-            dateString += '0' + (dateSubmit.getMonth()+1);
-        }
-        else {
-            dateString += (dateSubmit.getMonth()+1) + '-';
-        }
+        s_content += "dateTime=" + date + " " + time;
 
-        if (dateSubmit.getUTCDate() < 10) {
-            dateString += '0' + dateSubmit.getUTCDate();
-        }
-        else {
-            dateString += dateSubmit.getUTCDate();
-        }
-
-        if (dateSubmit.getUTCHours() < 10) {
-            dateString += ' 0' + dateSubmit.getUTCHours();
-        }
-        else {
-            dateString += ' ' + dateSubmit.getUTCHours();    
-        }
-
-        if (dateSubmit.getUTCMinutes() < 10) {
-            dateString += ':0' + dateSubmit.getUTCMinutes();
-        }
-        else {
-            dateString += ':' + dateSubmit.getUTCMinutes();    
-        }
-        
-        dateString += ":00";
-        
-        s_content += "dateTime=" + dateString;
-
-        console.log(dateString);
+        console.log(s_content);
         // Send the new task to the server as a POST request with submission value set to createTask so it is identifiable as this kind of request
         var myRequest = new XMLHttpRequest();
         myRequest.open("POST", "/", true);
         myRequest.setRequestHeader("Content-type", "text/plain");
         myRequest.send("submission=createTask&" + s_content);
-    
         // Call loadContent() (assumed to be in another javascript file for the respective page this is attached to)
         loadContent();
         getCategories(); // Refresh categories as well
@@ -202,7 +168,10 @@ function appendingCategories(content) {
         categoryOption.innerHTML = jsonContent.category_options[jsonContent.category_options.length-1 - i].name;
         categoryInputCreate.appendChild(categoryOption);
         // Apeend not just to create form, but also to the share form's create slect list
-        categoryInputShare.appendChild(categoryOption);
+        shareOption = document.createElement("OPTION");
+        shareOption.setAttribute("value", jsonContent.category_options[jsonContent.category_options.length-1 - i].id); // The value is the category's associated ID
+        shareOption.innerHTML = jsonContent.category_options[jsonContent.category_options.length-1 - i].name;
+        categoryInputShare.appendChild(shareOption);
     }
     // Setting the available colors according to what the response contains
     for (i in jsonContent.color_options) {
@@ -217,7 +186,6 @@ function appendingCategories(content) {
 async function getCategories() {
     // Set submission value to getCategories
     var request = "submission=getCategories";
-
     // Fetch the data and wait for response
     let data = await fetch(location.protocol + "//" + location.host, {
         method: 'POST',
