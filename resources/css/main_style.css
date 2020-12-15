@@ -65,7 +65,7 @@ nav ul li a:hover {
     z-index: 20;
 }
 
-#createForm form#createTask {
+form {
     text-align: left;
     padding: 20px;
     background-color: rgba(100,100,100, 0.8);
@@ -75,7 +75,28 @@ nav ul li a:hover {
     margin-bottom: 10px;
 }
 
-#createForm button#display {
+#createForm button#displayCreate {
+    position: absolute;
+    left: 0px;
+    width: 100%;
+}
+
+
+/*Style for share category form*/
+#shareForm {
+    position: fixed;
+    right: 10vw;
+    text-align: center;
+    z-index: 19;
+    bottom: 100%;
+}
+
+#shareForm form#createTask input {
+    margin-top: 10px;
+    margin-bottom: 10px;
+}
+
+#shareForm button#displayShare {
     position: absolute;
     left: 0px;
     width: 100%;

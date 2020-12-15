@@ -89,22 +89,30 @@ void handlePost(HttpRequest request) async {
     bodyMap["user_id"] = userID_S;
     // Determine if verified or not by checking the string before checking submission 
     if (userID_S != "") {
+
+      // https://www.geeksforgeeks.org/switch-case-in-dart/
       // Check what action is being requested using the key "submission" and call the appriopriate function
       // get methods return results, update/create/etc. don't
-      if (bodyMap["submission"] == "getTask") {
-        result = await getTask(bodyMap);
-      }
-      else if (bodyMap["submission"] == "getCategories") {
-        result = await getCategories(bodyMap);
-      }
-      else if (bodyMap["submission"] == "updateTask") {
-        updateTask(bodyMap);
-      }
-      else if (bodyMap["submission"] == "createTask") {
-        createTask(bodyMap);
-      }
-      else if (bodyMap["submission"] == "deleteTask") {
-        deleteTask(bodyMap);
+      switch (bodyMap["submission"]) {
+        case "getTask" : {
+          result = await getTask(bodyMap);
+        } break;
+        case "getCategories" : {
+          result = await getCategories(bodyMap);
+        } break;
+        case "updateTask" : {
+          updateTask(bodyMap);
+        } break;
+        case "createTask" : {
+          createTask(bodyMap);
+        } break;
+        case "deleteTask" : {
+          deleteTask(bodyMap);
+        } break;
+        case "shareCategory" : {
+          shareCategory(bodyMap);
+        } break;
+
       }
     }
   }

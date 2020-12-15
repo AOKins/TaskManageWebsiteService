@@ -5,7 +5,7 @@
         <title>Home</title>
         <link href="css/task_style.css" type="text/css" rel="stylesheet" />
         <script src="js/taskManage.js" defer></script>
-        <script src="js/createForm.js" defer></script>
+        <script src="js/forms.js" defer></script>
     </head>
     <body onload="loadContent(); getCategories()">
         <!--Side navigation bar-->
@@ -20,9 +20,9 @@
         <!--Form for creating new tasks-->
         <div id="createForm">
             <form id="createTask" method="POST">
-                <input type="text" id="title" name="title" placeholder="Task Title" required><br>
+                <input type="text" id="title" name="title" placeholder="Task Title" required maxlength="255"><br>
                 <textarea id="desc" name="desc" placeholder="Task Description" rows="6" cols="37" maxlength="255"></textarea><br>
-                <select id="category" name="category" required></select>
+                <select id="categoryCreate" name="category" required></select>
                 <input type="text" id="categoryText" name="categoryText" placeholder="New Category" maxlength="255">
                 <select id="color" name="color"></select>
                 <br>
@@ -31,7 +31,16 @@
                 <input type="submit" name="submission" value="Create Task">
             </form>
             <!--Toggles whether to show the form or not, should always be visible-->
-            <button id="display" enabled>X</button>
+            <button id="displayCreate" enabled>X</button>
+        </div>
+        <!--Form for setting a category to share with another user-->
+        <div id="shareForm">
+            <form id="shareCategory" method="POST">
+                <select id="categoryShare" name="category" required></select>
+                <input type="text" id="user" name="user" placeholder="Username" maxlength="255">
+                <input type="submit" name="submission" value="Share Task">
+            </form>
+            <button id="displayShare" enabled>Share</button>
         </div>
 
         <!-- The task objects are to be dynamically added into this div, for css setup there may be hard-coded examples-->

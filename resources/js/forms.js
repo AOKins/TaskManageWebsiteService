@@ -1,35 +1,35 @@
 // Javascript file to hold behavior related to the create Task form
 
 // Node for createTask form identified by id "createTask"
-var form = document.getElementById("createTask");
+var createForm = document.getElementById("createTask");
 
 // Node for the entire form object idenified 
-var formObj = document.getElementById("createForm");
+var createFormObj = document.getElementById("createForm");
 
-if (formObj != null && form != null) {
+if (createFormObj != null && createForm != null) {
     // Node for show button that toggles the display of the form or not
-    var showButtonNode = document.getElementById("display");
-    
+    var showButtonNode = document.getElementById("displayCreate");
+
     // True when the form should be visible the client, initially false (not showing)
-    var show = false;
+    var showCreate = false;
 
     // Define the behavior for the show button    
     showButtonNode.addEventListener("click", function() {
-        if (!show) {
+        if (!showCreate) {
             // Hide the form object by moving it outside of visible range
-            formObj.style.top = -formObj.style.height;
+            createFormObj.style.top = -createFormObj.style.height;
         }
         else {
             // Show by moving it down into visible range
-            formObj.style.top = formObj.style.height;
+            createFormObj.style.top = createFormObj.style.height;
         }
         // Set show variable to other state
-        show = !show;
+        showCreate = !showCreate;
     });
 
     // Add event listener for the show button of the form to adjust the height when clicked
     // Add an event listener for when submit is activated and perform the POST request when it happens 
-    form.addEventListener("submit", async function(event) {
+    createForm.addEventListener("submit", async function(event) {
         // Preventing default reload request/expectation
         event.preventDefault();
         // Get the form object in the document
@@ -39,17 +39,61 @@ if (formObj != null && form != null) {
         var i, s_content;
         // Make sure to initialize s_content to empty string before adding anything
         s_content = "";
+        var dateSubmit, date, time;
         for (i = 0; i < form.length-1; i++) {
             // Add this input field's content, using id to identify the variable being set
-            s_content += form[i].id + "=" + form[i].value + "&";
+            if (createForm[i].id == "due_date") {
+                date = createFrom[i].value;
+            }
+            else if (createForm[i].id == "due_time" ) {
+                time = createForm[i].value;
+            }
+            else  {
+                s_content += createForm[i].id + "=" + createForm[i].value + "&";
+            }
             // Reset all the form selections except category (as it doesn't make sense to show blank category)
-            if (form[i].id != "category") {
-                form[i].value = "";
+            if (createForm[i].id != "category") {
+                createForm[i].value = "";
             }
         }
-        // Will need to remove the last "&"
-        s_content = s_content.substring(0, s_content.length-1);
-    
+
+        dateSubmit = new Date(date + " " + time);
+        // Convert the submission into UTC timezone        
+        var dateString = dateSubmit.getUTCFullYear()+"-";
+        
+        if (dateSubmit.getMonth()+1 < 10) {
+            dateString += '0' + (dateSubmit.getMonth()+1);
+        }
+        else {
+            dateString += (dateSubmit.getMonth()+1) + '-';
+        }
+
+        if (dateSubmit.getUTCDate() < 10) {
+            dateString += '0' + dateSubmit.getUTCDate();
+        }
+        else {
+            dateString += dateSubmit.getUTCDate();
+        }
+
+        if (dateSubmit.getUTCHours() < 10) {
+            dateString += ' 0' + dateSubmit.getUTCHours();
+        }
+        else {
+            dateString += ' ' + dateSubmit.getUTCHours();    
+        }
+
+        if (dateSubmit.getUTCMinutes() < 10) {
+            dateString += ':0' + dateSubmit.getUTCMinutes();
+        }
+        else {
+            dateString += ':' + dateSubmit.getUTCMinutes();    
+        }
+        
+        dateString += ":00";
+        
+        s_content += "dateTime=" + dateString;
+
+        console.log(dateString);
         // Send the new task to the server as a POST request with submission value set to createTask so it is identifiable as this kind of request
         var myRequest = new XMLHttpRequest();
         myRequest.open("POST", "/", true);
@@ -62,22 +106,65 @@ if (formObj != null && form != null) {
     });
 }
 
+var shareObject = document.getElementById("shareForm")
+var shareForm = document.getElementById("shareCategory");
+var shareFormCategory = document.getElementById("categoryShare");
+
+if (shareForm != null && shareFormCategory != null && shareObject != null) {
+    
+    // Node for show button that toggles the display of the form or not
+    var showButtonNode = document.getElementById("displayShare");
+    
+    // True when the form should be visible the client, initially false (not showing)
+    var showShare = false;
+
+    // Define the behavior for the show button    
+    showButtonNode.addEventListener("click", function() {
+        if (!showShare) {
+            // Hide the form object by moving it outside of visible range
+            shareObject.style.top = -shareObject.style.height;
+        }
+        else {
+            // Show by moving it down into visible range
+            shareObject.style.top = shareObject.style.height;
+        }
+        // Set show variable to other state
+        showShare = !showShare;
+    });
+
+    // Add event listener for the show button of the form to adjust the height when clicked
+    // Add an event listener for when submit is activated and perform the POST request when it happens 
+    shareForm.addEventListener("submit", async function(event) {
+        // Preventing default reload request/expectation
+        event.preventDefault();
+        // Get the form object in the document
+        var s_content = "categoryID=" +  shareForm[0].value + "&" + "username=" + shareForm[1].value
+
+        // Send the new task to the server as a POST request with submission value set to createTask so it is identifiable as this kind of request
+        var myRequest = new XMLHttpRequest();
+        myRequest.open("POST", "/", true);
+        myRequest.setRequestHeader("Content-type", "text/plain");
+        myRequest.send("submission=shareCategory&" + s_content);
+    });
+}
+
 // Initially show is false (set to hidden)
-var categoryInput = document.getElementById("category");
+var categoryInputCreate = document.getElementById("categoryCreate");
+var categoryInputShare = document.getElementById("categoryShare");
 // Node for the form input that allows the user to create new category for their new task
 var categoryText = document.getElementById("categoryText");
 // Node for color selecting item in the file
 var colorSelect = document.getElementById("color");
 
 // Add an click listner for category input to dynamically show the category name text only when *New* option selected
-if (categoryInput != null) {
+if (categoryInputCreate != null) {
     // Set previousValue to be current intiially
-    var previousValue = categoryInput.value;
-    categoryInput.addEventListener("click", function(){
+    var previousValue = categoryInputCreate.value;
+    categoryInputCreate.addEventListener("click", function(){
         // If the value has changed, then check the input value
-        if (categoryInput.value != previousValue) {
+        if (categoryInputCreate.value != previousValue) {
             // If new value is *New*, then show the categoryText and colorSelect inline
-            if (categoryInput.value == "*New*") {
+            if (categoryInputCreate.value == "*New*") {
                 categoryText.style.display ="inline";
                 colorSelect.style.display ="inline";
             }
@@ -88,7 +175,7 @@ if (categoryInput != null) {
             }
         }
         // Update previousValue to what the current value is
-        previousValue = categoryInput.value;
+        previousValue = categoryInputCreate.value;
     });
 }
 
@@ -97,21 +184,25 @@ function appendingCategories(content) {
     // Convert content to json format
     var jsonContent = JSON.parse(content);
     // Initially clear the content of the category and color select options
-    categoryInput.innerHTML = "";
+    categoryInputCreate.innerHTML = "";
+    categoryInputShare.innerHTML = "";
+    
     colorSelect.innerHTML = "";
 
     var categoryOption = document.createElement("OPTION");
-    // Set new category to top
+    // Set new category to top for create form only
     categoryOption.setAttribute("value", "*New*");
     categoryOption.innerHTML = "*New*";
-    categoryInput.appendChild(categoryOption);
+    categoryInputCreate.appendChild(categoryOption);
 
     // Append previous categories created
     for (i in jsonContent.category_options) {
         categoryOption = document.createElement("OPTION");
         categoryOption.setAttribute("value", jsonContent.category_options[jsonContent.category_options.length-1 - i].id); // The value is the category's associated ID
         categoryOption.innerHTML = jsonContent.category_options[jsonContent.category_options.length-1 - i].name;
-        categoryInput.appendChild(categoryOption);
+        categoryInputCreate.appendChild(categoryOption);
+        // Apeend not just to create form, but also to the share form's create slect list
+        categoryInputShare.appendChild(categoryOption);
     }
     // Setting the available colors according to what the response contains
     for (i in jsonContent.color_options) {
@@ -122,7 +213,7 @@ function appendingCategories(content) {
     }
 }
 
-// A function called onload, gets categories from the server and appends to the form for drop-down selection
+// A function called onload, gets categories from the server and appends to the forms for drop-down selection (data used in both createForm and shareForm)
 async function getCategories() {
     // Set submission value to getCategories
     var request = "submission=getCategories";

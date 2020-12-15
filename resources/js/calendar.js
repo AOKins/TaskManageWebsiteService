@@ -15,29 +15,19 @@ var datesObj = document.getElementById("calendarDates");
 //        date for what the date is to access the correct tasks
 function loadTasksForDate(node, date, jsonData) {
     // Store/Convert the date item into a string item
-    var dateS = date.getFullYear() + "-" + (date.getMonth()+1) + "-" + (date.getDate());
+    var dateS = date.getUTCFullYear() + "-" + (date.getUTCMonth()+1) + "-" + (date.getUTCDate());
     var listItem;
-    var outputCount = 0;
+
     // Iterate through each task associated with the date, appending just the title as a list item into the date box
     for (task in jsonData[dateS]) {
-            if (outputCount < 4) {
-                listItem = document.createElement("LI");
-                listItem.appendChild(document.createTextNode(jsonData[dateS][task].title));
-                if (jsonData[dateS][task].checked == "true") {
-                    listItem.style.display = "none"; // Hide in date object this task (but kept in for date selection the data isn't lost)
-                }
+        listItem = document.createElement("LI");
+        listItem.appendChild(document.createTextNode(jsonData[dateS][task].title));
+        
+        if (jsonData[dateS][task].checked == "true") {
+            listItem.style.display = "none"; // Hide in date object this task (but kept in for date selection the data isn't lost)
+        }
 
-                node.appendChild(listItem);
-            }
-            else if (outputCount == 4) {
-                listItem = document.createElement("LI");
-                listItem.appendChild(document.createTextNode("..."));
-                node.appendChild(listItem);
-            }
-            else { // outputCount > 5, need to end outputting from the loop
-                break;
-            }
-            outputCount++;
+        node.appendChild(listItem);
     }
     
 }
@@ -55,7 +45,7 @@ async function generateCalendar(month, year, content) {
     yearTag.appendChild(document.createTextNode(year));
 
     // Create variable that is first date on the given month as starting reference point and using for iteration
-    var date = new Date(year, month, 1, 0,0,0,0);
+    var date = new Date(year, month, 1, now.getHours(), now.getMinutes(), 0,0);
 
     // Offset backwards to start of week (for example, Monday would have 1 day before which is Sunday)
     date.setDate(date.getDate() - date.getDay());

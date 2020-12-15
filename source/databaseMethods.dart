@@ -11,7 +11,7 @@ Future<Results> performQueryOnMySQL(String query) async {
     var settings = new ConnectionSettings(
       host: 'localhost', 
       port: 3306,
-      user: 'testUser', // test user to login into with using unsecure password
+      user: 'testUser', // test user to login into with using obvious password
       password: "password",
       db: 'task_manager', // connect to task_manager database in the server
     );
@@ -21,12 +21,20 @@ Future<Results> performQueryOnMySQL(String query) async {
     //figured it would at least get here so i could see if it worked but i dont think it gets there 
     if (conn == null){
       print('ERROR - COULD NOT CONNECT TO DBMS');
+      return null;
     }
+    else {
+      try {
 
-    var results = conn.query(query);
+      var results = conn.query(query);
 
-    conn.close();
-    return results;
+      conn.close();
+      return results;
+      }
+      catch (e) {
+        print("Invalid query -> $e");
+      }
+    }
   }
   catch(e) {
     print("ERROR WITH QUERY -> $e");
@@ -116,12 +124,12 @@ void createTask(Map<String,String> inputData) async {
     // If not a new category, then "category" key should hold the id
       id = inputData["category"];
     }
-    String dueTime = inputData["due_date"] + " " + inputData["due_time"];
-    // Trim to remove spaces from ends if they exist 
-    dueTime = dueTime.trim();
+    String dueTime = inputData["dateTime"];
+
     // Generate query and perform
     String query = "INSERT INTO task_manager.task (title,description,dateTime,ownerID,categoryID, completion, recurringID) ";
-    query += "VALUES ('" + inputData["title"] + "','" + inputData["desc"] + "', '$dueTime:00'," + inputData["user_id"] + ",$id, 0, 0)";
+    query += "VALUES ('" + inputData["title"] + "','" + inputData["desc"] + "', '$dueTime'," + inputData["user_id"] + ",$id, 0, 0)";
+    print(query);
     performQueryOnMySQL(query);
 
 }
@@ -137,13 +145,13 @@ Future<List<int>> getTask(Map<String,String> inputData) async {
   
   String query = "";
   // Generating the query to get all tasks for a user in given time range, includes shared tasks and category info
-  query += "SELECT taskID, taskTitle, taskDesc, dateTime, completion, category.name as categoryName, category.color as color, user.username, allTasks.ownerID ";
-  query += "FROM (SELECT DISTINCT ID as taskID, title as taskTitle, description as taskDesc, dateTime, completion, task.categoryID as categoryID, task.ownerID as ownerID ";
-	query += "FROM task, share ";
-	query += "WHERE (share.userID = $user_id AND task.categoryID = share.categoryID) OR task.ownerID = $user_id  AND DATE(dateTime) >= '$startRange' AND DATE(dateTime) <= '$endRange') as allTasks, category, user ";
-  query += "WHERE category.ID = allTasks.categoryID and user.id = allTasks.ownerID ORDER BY dateTime;";
+  query += "SELECT task.ID, task.title, task.description, task.dateTime, task.completion, viewCategories.name, viewCategories.color, user.username as ownerName, task.ownerID ";
+  query += "FROM (SELECT DISTINCT category.ID, category.ownerID as ownerID, category.name, category.color ";
+	query += "FROM category, share WHERE category.ownerID = $user_id OR (share.userID = $user_id AND share.categoryID = category.ID)) as viewCategories, task, user ";
+	query += "WHERE user.ID = task.ownerID AND viewCategories.ID = task.categoryID AND task.dateTime <= '$endRange UTC' AND task.dateTime >= '$startRange UTC';";
   // Create a map to a list of Maps, use date as key to list of task info in the form of maps
   Map<String, List< Map<String,String>>> content = new Map();
+  print(query);
   Results results = await performQueryOnMySQL(query);
 
   String dateTime, date;// temp holder for a row's dateTime
@@ -245,7 +253,33 @@ void deleteTask(Map<String,String> inputData) {
   String query;
   String delete_id = inputData["task_id"];
   query = "DELETE FROM task_manager.task WHERE ID=$delete_id";
-
+  // Perform the delete, no results expected
   performQueryOnMySQL(query);
+}
 
+Future<String> getUserIDfromUsername(String username) async {
+  String query = "SELECT user.id FROM task_manager.user WHERE username='$username'";
+  Results result = await performQueryOnMySQL(query);
+
+  return result.first[0].toString();
+}
+
+
+// Method for sharing a category with another user
+// Assumes the client making this action is the valid owner of the category and that the categoryID is valid
+// Output: Assuming categoryID, client's ID, and the provided user ID to share with are valid, it is added to the share table
+void shareCategory(Map<String,String> inputData) async {
+  String query;
+  // Get the values from the input data
+  String categoryID = inputData["categoryID"];
+  String userName = inputData["username"];
+  String ownerID = inputData["user_id"];
+  // Get the user id for the user with the provided username
+  String userID = await getUserIDfromUsername(userName);
+
+  // Generate and then perform the query
+  query = "INSERT INTO task_manager.share (categoryID, userID, ownerID) VALUES ";
+  query += "($categoryID, $userID, $ownerID)";
+  print(query);
+  performQueryOnMySQL(query);
 }

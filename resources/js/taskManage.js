@@ -3,7 +3,8 @@
 // Variable to hold today's date info as reference
 var today = new Date();
 // Variable to hold today as a formatted string to use with jsonContent 
-var today_UTC_S = today.getUTCFullYear() + "-" + (today.getUTCMonth()+1) + "-" + (today.getUTCDate());
+// adding one to month because value ranges from 0 to 11 instead of 1 to 12
+var today_UTC_S = today.getUTCFullYear() + "-" + (today.getUTCMonth()+1) + "-" + today.getUTCDate();
 
 // Function to append task to a list
 // Input: listStart - node to start of the list
@@ -42,6 +43,22 @@ function appendTask(listStart, task) {
     // Id is equal to the id of the task in the database
     taskContainer.setAttribute("id", task.task_id);
 
+    // If shared, append an element that states who the owner is
+    if (task.shared == "true") {
+        taskPart = document.createElement("DiV");
+        taskPart.innerHTML = ("Shared by " + task.ownerName);
+        taskPart.setAttribute("id", "shareTag");
+        taskContainer.appendChild(taskPart);
+    }
+    // If not a shared task, append an option for deleting the task 
+    else if (task.shared != "true") {
+        taskPart = document.createElement("BUTTON");
+        taskPart.setAttribute("label", "delete");
+        taskPart.setAttribute("class", "delete");
+        taskPart.setAttribute("onclick", "deleteTaskHandler(" + task.task_id + ")")
+        taskContainer.appendChild(taskPart);    
+    }
+
     // Appending button task container which requires task id value to identify the task 
     var taskPart = document.createElement("BUTTON");
     taskPart.setAttribute("label", "check");
@@ -60,28 +77,13 @@ function appendTask(listStart, task) {
     taskPart.setAttribute("id", "time");
     // If task's due date is not same as today's, should display what the date is (since the time is relative to the day it's due)
     if (localDate != (today.getMonth()+1) + "-" + (today.getDate()).toString()) {
-        taskPart.appendChild(document.createTextNode(localDate + " " + localTime));
+        taskPart.appendChild(document.createTextNode((taskDate.getMonth()+1) + " " + taskDate.getDate()));
     }
     else {
         taskPart.appendChild(document.createTextNode(localTime));
     }
     taskContainer.appendChild(taskPart);
 
-    // If shared, append an element that states who the owner is
-    if (task.shared == "true") {
-        taskPart = document.createElement("DiV");
-        taskPart.innerHTML = ("Shared by " + task.ownerName);
-        taskPart.setAttribute("id", "shareTag");
-        taskContainer.appendChild(taskPart);
-    }
-    // If not a shared task, append an option for deleting the task 
-    else if (task.shared != "true") {
-        taskPart = document.createElement("BUTTON");
-        taskPart.setAttribute("label", "delete");
-        taskPart.setAttribute("class", "delete");
-        taskPart.setAttribute("onclick", "deleteTaskHandler(" + task.task_id + ")")
-        taskContainer.appendChild(taskPart);    
-    }
 
     taskContainer.appendChild(document.createElement("br"));
 
@@ -115,15 +117,13 @@ function outputTasks(content) {
         
         // If the list is for tasks related to today
         if (listOfLists[list].id == "today" && jsonContent[today_UTC_S] != null) {
-
             for (task in jsonContent[today_UTC_S]) {
                 appendTask(listOfLists[list], jsonContent[today_UTC_S][task]);
             }
         }
 
         else if (listOfLists[list].id == "next2days") {
-            // Using for loop to iterate tomorrow (i = 1) and the next day (i = 2)
-            var i;
+            var i;            // Using for loop to iterate tomorrow (i = 1) and the next day (i = 2)
             for (i = 1; i < 3; i++) {
                 date = today.getUTCFullYear() + "-" + (today.getUTCMonth()+1) + "-" + (today.getUTCDate()+i);
                 if (jsonContent[date] != null) {
@@ -153,6 +153,7 @@ async function loadContent()  {
     var request = "submission=getTask&";
     // Define the next week date in UTC timezone for end date (is ahead by 7 days)
     var nextWeek_UTC_S = today.getUTCFullYear() + "-" + (today.getUTCMonth()+1) + "-" + (today.getUTCDate()+7);
+
     request += "startDate=" + today_UTC_S;
     request += "&endDate=" + nextWeek_UTC_S;
 
@@ -175,14 +176,16 @@ function taskCompletionHandler(id) {
     // Get Node for task with id to identify its status
     var this_task = document.getElementById(id);
     var task_complete = this_task.getAttribute("completed");
-    var task_color = this_task.getAttribute("categoryColor");
+    var task_color = this_task.getAttribute("categorycolor");
 
     // Update locally the task's status by updating its attribute
-    if (task_complete=="false") {
+    if (task_complete == "false") {
+        this_task.setAttribute("completed", "true");
         task_complete = "true";
         this_task.style.backgroundColor = "grey";
     }
     else {
+        this_task.setAttribute("completed", "false");
         task_complete = "false";
         this_task.style.backgroundColor = task_color;
     }
@@ -194,7 +197,6 @@ function taskCompletionHandler(id) {
     myRequest.send("submission=updateTask&task_id=" + id + "&completion=" + task_complete);
     // Assuming no need for response (change done locally prior)
 }
-
 
 function deleteTaskHandler(id) {
     var this_task = document.getElementById(id);
