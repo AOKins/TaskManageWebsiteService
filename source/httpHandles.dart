@@ -96,7 +96,6 @@ void handlePost(HttpRequest request) async {
       request.response.close();
       return;
     }
-    print("cookie: " + userID_S);
       // Add the id to the map
     bodyMap["user_id"] = userID_S;
     // Determine if verified or not by checking the string before checking submission 
