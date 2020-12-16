@@ -14,22 +14,68 @@ var datesObj = document.getElementById("calendarDates");
 // Input: node for where the current date item is
 //        date for what the date is to access the correct tasks
 function loadTasksForDate(node, date, jsonData) {
-    // Store/Convert the date item into a string item
-    var dateS = date.getUTCFullYear() + "-" + (date.getUTCMonth()+1) + "-" + (date.getUTCDate());
+    var dateS = date.getFullYear() + "-" + (date.getMonth()+1) + "-" + (date.getDate());
+    console.log("Finding tasks for " + dateS)
     var listItem;
-
-    // Iterate through each task associated with the date, appending just the title as a list item into the date box
-    for (task in jsonData[dateS]) {
-        listItem = document.createElement("LI");
-        listItem.appendChild(document.createTextNode(jsonData[dateS][task].title));
-        
-        if (jsonData[dateS][task].checked == "true") {
-            listItem.style.display = "none"; // Hide in date object this task (but kept in for date selection the data isn't lost)
-        }
-
-        node.appendChild(listItem);
-    }
     
+    // Want to for a given date check the json's previous and next days along with this date's
+    for (i = -1; i <= 1; i++) {    
+        // Set what 
+        var UTCDate = new Date();
+        
+        UTCDate.setDate(date.getDate() + i);
+
+        var checkDate_S = UTCDate.getFullYear() + "-" + (UTCDate.getMonth()+1) + "-" + (UTCDate.getDate());
+        
+        for (task in jsonData[checkDate_S]) {
+            var this_task = jsonData[checkDate_S][task];
+
+            
+            var year = this_task.date.toString().substring(0,4);
+            var month = this_task.date.toString().substring(5,7);
+            var day = this_task.date.toString().substring(8,10);
+            var hour = this_task.time.toString().substring(0,2);
+            var minute = this_task.time.toString().substring(3,5);
+
+            // Construct a date object using the task's dateTime
+            var UTCDate = new Date(Date.UTC(year, month-1,day, hour-(now.getTimezoneOffset() % 60) ,minute))
+
+            // Convert the date for this task to local time equivalent
+            var localDate = UTCDate.getFullYear() + "-";
+            
+            if (UTCDate.getMonth() < 10) {
+                localDate += "0" + (UTCDate.getMonth()+1) + "-";        
+            }
+            else {
+                localDate += (UTCDate.getMonth()+1) + "-";
+            }
+            if (UTCDate.getDate() < 10) {
+                localDate += "0" + UTCDate.getDate() + '-';
+            }
+            else {
+                localDate += UTCDate.getDate();
+            }
+            
+            var localTime =  UTCDate.getHours() + ":" + UTCDate.getMinutes();
+            if (UTCDate.getMinutes() < 10) {
+                localTime += "0";
+            }
+
+
+            console.log(this_task.title + " -> " + localDate + " vs. " + dateS)
+
+            if (localDate == dateS) {
+                listItem = document.createElement("LI");
+                listItem.appendChild(document.createTextNode(this_task.title));
+    
+                if (this_task.checked == "true") {
+                    listItem.style.display = "none"; // Hide in date object this task (but kept in for date selection the data isn't lost)
+                }
+    
+                node.appendChild(listItem);
+            }
+        }    
+    }
 }
 
 async function generateCalendar(month, year, content) {
