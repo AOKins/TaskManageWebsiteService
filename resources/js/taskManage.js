@@ -2,7 +2,7 @@
 
 // Variable to hold today's date info as reference
 var today = new Date();
-
+var tempDate = new Date();
 // Function to append task to a list
 // Input: listStart - node to start of the list
 //        task - json of the task object needing to be added
@@ -133,7 +133,7 @@ function outputTasks(content) {
     // Index number for accessing a list in the list of lists
     var list;
 
-    var tempDate = new Date();
+    tempDate = new Date();
     var tempDate_S;
     var dateAllowed;
     for (list = 0; list < numLists; list++) {
@@ -148,13 +148,12 @@ function outputTasks(content) {
             dateAllowed = today.getUTCFullYear() + "-" + (today.getMonth()+1) + "-" + (today.getDate());
             
             // Get 3 date range with today being today's UTC date
-            for (i = -1; i < 2; i++) {
+            for (i = -1; i <= 1; i++) {
                 // Set the temp date holder to be today's date minus one
                 tempDate.setUTCDate(today.getUTCDate()+i+offset);
                 tempDate_S = tempDate.getUTCFullYear() + "-" + (tempDate.getMonth()+1) + "-" + (tempDate.getDate());
                 if (jsonContent[tempDate_S] != null) {
                     for (task in jsonContent[tempDate_S]) {
-                        
                         appendTask(listOfLists[list], jsonContent[tempDate_S][task], dateAllowed);
                     }
                 }
@@ -167,7 +166,7 @@ function outputTasks(content) {
                     dateAllowed = tempDate.getUTCFullYear() + "-" + (tempDate.getMonth()+1) + "-" + (tempDate.getDate());
                     
                     // Get 3 date range with today being today's UTC date
-                    for (i = -1; i < 2; i++) {
+                    for (i = -1; i <= 1; i++) {
                         // Set the temp date holder to be offset for number of days away from today's
                         tempDate.setUTCDate(today.getUTCDate()+i+offset);
                         tempDate_S = tempDate.getUTCFullYear() + "-" + (tempDate.getMonth()+1) + "-" + (tempDate.getDate());
@@ -186,7 +185,7 @@ function outputTasks(content) {
                 dateAllowed = tempDate.getUTCFullYear() + "-" + (tempDate.getMonth()+1) + "-" + (tempDate.getDate());
                 
                 // Get 3 date range with today being today's UTC date
-                for (i = -1; i < 2; i++) {
+                for (i = -1; i <= 1; i++) {
                     // Set the temp date holder to be offset for number of days away from today's
                     tempDate.setUTCDate(today.getUTCDate()+i+offset);
                     tempDate_S = tempDate.getUTCFullYear() + "-" + (tempDate.getMonth()+1) + "-" + (tempDate.getDate());
@@ -205,13 +204,19 @@ function outputTasks(content) {
 async function loadContent()  {
     var request = "submission=getTask&";
 
+    // Object for next week's date
+    var nextWeek = new Date();
+    nextWeek.setDate(today.getUTCDate()+8);
+
     // Variable to hold today as a formatted string to use with query 
     // adding one to month because value ranges from 0 to 11 instead of 1 to 12
     // Subtracting one day to ensure capture of all tasks
     var today_UTC_S = today.getUTCFullYear() + "-" + (today.getUTCMonth()+1) + "-" + (today.getUTCDate()-1);
-    // Define the next week date in UTC timezone for end date (is ahead by 7 days) plus 1 to ensure all tasks are captured for accurate output
-    var nextWeek_UTC_S = today.getUTCFullYear() + "-" + (today.getUTCMonth()+1) + "-" + (today.getUTCDate()+8);
+    
+    // Define the next week date string using nextWeek date object
+    var nextWeek_UTC_S = nextWeek.getUTCFullYear() + "-" + (nextWeek.getUTCMonth()+1) + "-" + (nextWeek.getUTCDate());
 
+    // Add to request body
     request += "startDate=" + today_UTC_S;
     request += "&endDate=" + nextWeek_UTC_S;
 

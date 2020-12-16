@@ -5,7 +5,7 @@ var monthName = ["January", "February", "March", "April", "May", "June", "July",
 var now = new Date(); // variable to hold what the current date is
 var currentMonth = new Date(); // variable to hold what the displayed month is which may not be today's month
 
-// variables to contain common Nodes for less repetitive declarations  
+// variables to contain common Nodes for less repetitive declarations in functions
 var monthTag = document.getElementById("month")
 var yearTag = document.getElementById("year")
 var datesObj = document.getElementById("calendarDates");
@@ -14,19 +14,21 @@ var datesObj = document.getElementById("calendarDates");
 // Input: node for where the current date item is
 //        date for what the date is to access the correct tasks
 function loadTasksForDate(node, date, jsonData) {
+    // dateS is the formatted string of the date that is currently being appended (for example today's date so that only tasks with today's date are appneded to the node)
     var dateS = date.getFullYear() + "-" + (date.getMonth()+1) + "-" + (date.getDate());
-    console.log("Finding tasks for " + dateS)
     var listItem;
     
-    // Want to for a given date check the json's previous and next days along with this date's
+    // Want to for a given date check the json's previous and next days along with this current date's to catch any day's that may be off because of timezones
     for (i = -1; i <= 1; i++) {    
-        // Set what 
+        // UTCDate is to be a temp date object for holding the offset to check
         var UTCDate = new Date();
         
         UTCDate.setDate(date.getDate() + i);
 
+        // Check date is a composed string to be used as a key to look through a list of tasks in the jsonData to find tasks that because of timezones are listed in seperate dates
         var checkDate_S = UTCDate.getFullYear() + "-" + (UTCDate.getMonth()+1) + "-" + (UTCDate.getDate());
         
+        // Check each task in the given list to see if it should be added, need to compose/conver the times to accurrately determine
         for (task in jsonData[checkDate_S]) {
             var this_task = jsonData[checkDate_S][task];
 
@@ -37,12 +39,15 @@ function loadTasksForDate(node, date, jsonData) {
             var hour = this_task.time.toString().substring(0,2);
             var minute = this_task.time.toString().substring(3,5);
 
-            // Construct a date object using the task's dateTime
+            // Construct a date object using the task's dateTime and offset by timezone
             var UTCDate = new Date(Date.UTC(year, month-1,day, hour-(now.getTimezoneOffset() % 60) ,minute))
 
             // Convert the date for this task to local time equivalent
             var localDate = UTCDate.getFullYear() + "-";
             
+
+            // Compose the local date of the task as a formatted string
+            // Append 0's if the values are less than 10 (single digit)
             if (UTCDate.getMonth() < 10) {
                 localDate += "0" + (UTCDate.getMonth()+1) + "-";        
             }
@@ -61,13 +66,12 @@ function loadTasksForDate(node, date, jsonData) {
                 localTime += "0";
             }
 
-
-            console.log(this_task.title + " -> " + localDate + " vs. " + dateS)
-
+            // If the localized date of this task is equal to the date allowed for this node, then add it on
             if (localDate == dateS) {
                 listItem = document.createElement("LI");
                 listItem.appendChild(document.createTextNode(this_task.title));
-    
+
+                // If checked as complete, hide the task from the calendar by default
                 if (this_task.checked == "true") {
                     listItem.style.display = "none"; // Hide in date object this task (but kept in for date selection the data isn't lost)
                 }
@@ -145,19 +149,24 @@ async function generateCalendar(month, year, content) {
 
 // Script function called when the html page has loaded, handles loading the page content
 async function loadContent()  {
+    // Submission is getting tasks
     var request = "submission=getTask&";
     // Set the start border to be the previous month's 22nd (22nd as a reasonable buffer back for what could possibly viewed in the calendar's previous dates)
     var start_S = currentMonth.getFullYear() +"-"+ (currentMonth.getMonth()) + "-22";
+
     // Set the end border to be the next month's 7thd (7th as a reasonable buffer forward for what could possibly viewed in the calendar's future dates)
     var NextMonthS = ((currentMonth.getMonth()+2) % 12).toString();
     var yearS = currentMonth.getFullYear();
 
-    if (NextMonthS == "1") { // If the next month is january, will need to incrmeent the year value for the end (otherwise the end is actually the past!)
+    if (NextMonthS == "1") { // If the next month is january, will need to increment the year value for the end (otherwise the end is actually the past!)
         yearS = currentMonth.getFullYear()+1;
     }
+    // Compose end date string
     var end_S =  yearS + "-" + NextMonthS + "-07";
+    // Add time ranges to the request body
     request += "startDate=" + start_S;
     request += "&endDate=" + end_S;
+
     // Fetch the data and wait for response
     let data = await fetch(location.protocol + "//" + location.host, {
         method: 'POST',
@@ -178,11 +187,13 @@ async function loadContent()  {
 
 // Function called by navigation buttons that move forward or backward by one month
 async function changeMonth(forward) {
+    // If forward move the set month plus 1, else is set backward
     if (forward) {
         currentMonth.setMonth(currentMonth.getMonth() + 1);
     }
     else {
         currentMonth.setMonth(currentMonth.getMonth() - 1);
     }
+    // Reload content for new month
     loadContent();
 }

@@ -59,14 +59,16 @@ ul {
     padding-bottom: 2px;
 }
 
+/*Dates from previous month or future month are colored differently*/
 #calendarDates ul.past {
     background-color: grey;
 } 
-#calendarDates ul.today {
-    background-color: lightcoral;
-} 
 #calendarDates ul.future {
     background-color: lightgrey;
+} 
+/*Today's date is highlighted with a light red-ish color*/
+#calendarDates ul.today {
+    background-color: lightcoral;
 } 
 
 .calendar_button {
@@ -77,7 +79,7 @@ ul {
     top: 10px;
 }
 
-/* Style for list of selected date that is a feature not currently implemented */
+/* Style for list of a selected date that is a feature not currently implemented */
 ul#dateList {
     background-color: white;
     position: fixed;
@@ -90,7 +92,7 @@ ul#dateList {
 
 ul#dateList #header {
     position: relative;
-    background-color: purple;
+    background-color: lightgrey;
     font-size: 28px;
     text-align: center;
     border-bottom: solid 2px black;

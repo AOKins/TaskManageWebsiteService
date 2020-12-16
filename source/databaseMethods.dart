@@ -6,7 +6,6 @@ import 'package:mysql1/mysql1.dart'; // For connecting into MySQL
 // Input: query - string for SQL statement to perform
 // Output: returns results of query in Results object
 Future<Results> performQueryOnMySQL(String query) async {
-  print(query);
   // Attempt to open a connection and perform a query
   try {
     var settings = new ConnectionSettings(
@@ -19,7 +18,7 @@ Future<Results> performQueryOnMySQL(String query) async {
 
     var conn = await MySqlConnection.connect(settings);
 
-    //figured it would at least get here so i could see if it worked but i dont think it gets there 
+    // Check to make sure the connection worked 
     if (conn == null){
       print('ERROR - COULD NOT CONNECT TO DBMS');
       return null;
@@ -50,17 +49,19 @@ Future<String> verifyCookieAccess(List<String> cookies) async {
   // If the there are cookies then we need to iterate through them and perform a query to see if it's in the DBMS
   if (cookies.length != null) {
     for (int i = 0; i < cookies.length; i++) {
+      // Get results from the query looking for ID's that match the cookie's
       var results = await performQueryOnMySQL('SELECT ID FROM user WHERE ID = ' + cookies[i]);
-      // Like verifyLoginCred, this is a hard coded bad method that needs to be replaced with usage of the database
+      // If resulting match found then return first found
       for (var row in results) {
         if (row[0] > 0) {
-          return cookies[i];
+          return cookies[i].toString();
         }
       }
     }
   }
-  // Return "" if no user was found
+  // Return "" if no cookie
   return "";
+
 }
 
 // Method to determine if a user attempting to login has the correct username and password
@@ -68,6 +69,7 @@ Future<String> verifyCookieAccess(List<String> cookies) async {
 // Input: given username and password to find user in DBMS with
 // Output: User ID in form of a string that was found
 Future<String> verifyLoginCred(String givenUser, String givenPass) async {
+  // Query for finding user that has same username and password as login (username is assumed to be unique and so there couldn't possibly be multiple users)
   String query = "SELECT ID FROM user WHERE username = '$givenUser' AND password='$givenPass'";  
   var results = await performQueryOnMySQL(query);
   for (var row in results) {
@@ -87,10 +89,13 @@ void updateTask(Map<String,String> inputData) {
   int completion = 0;
   // Get the completion value
   if (inputData["completion"] != null ) {
-    // Get the id of the task and setup/perform the query
+    // Get the completion value and id of the task to setup/perform the query
     completion = (inputData["completion"] == "true") ? 1 : 0;
     var taskID = inputData["task_id"];
+
+    // Setup the query to update the task's completion value
     query = "UPDATE task SET completion=$completion WHERE ID=$taskID;";
+    // Perform the query and do not get/return results
     performQueryOnMySQL(query);
   }
 }
@@ -106,9 +111,13 @@ Future<String> createCategory(String owner, String name, String color) async {
   // Get the id of the new category using the new id and name
   query = "SELECT ID FROM category WHERE ownerID=$owner AND name='$name'";
   Results results = await performQueryOnMySQL(query);
-  // Return the result
-  for (var value in results) {
-    return value[0].toString();
+
+  // Return the result or null if not successful
+  if (results.first != null) {
+    return results.first[0].toString();
+  }
+  else {
+    return null;
   }
 }
 
@@ -128,17 +137,15 @@ void createTask(Map<String,String> inputData) async {
     var dueDateTime = DateTime.parse(inputData["dateTime"]);
     String dueTime = dueDateTime.toString();
 
-    // Generate query and perform
+    // Generate query and perform, do not get results
     String query = "INSERT INTO task_manager.task (title,description,dateTime,ownerID,categoryID, completion, recurringID) ";
-    query += "VALUES ('" + inputData["title"] + "','" + inputData["desc"] + "', '$dueTime'," + inputData["user_id"] + ",$id, 0, 0)";
+    query += "VALUES ('" + inputData["title"] + "','" + inputData["desc"] + "', '$dueTime'," + inputData["user_id"] + ", $id, 0, 0)";
     performQueryOnMySQL(query);
-
 }
 
 // Method to getting a task
 // Input: startDate and endDate and userID
-// Output: Binary output (list<int>) of results to be interpreted as a json of results
-//            Contains task info to display to user and identify tasks
+// Output: Binary output (list<int>) of results to be interpreted as a json of task info grouped by dates and ordered by dateTime
 Future<List<int>> getTask(Map<String,String> inputData) async {
   String startRange = inputData["startDate"];
   String endRange = inputData["endDate"];
@@ -155,6 +162,7 @@ Future<List<int>> getTask(Map<String,String> inputData) async {
   Results results = await performQueryOnMySQL(query);
 
   String dateTime, date, time;// temp holder variables for a row's dateTime info as strings
+
   // For each row, append into the content map the row's data as a adding on the list a new map
   results.forEach((row) => {
     // Get a string of date only to use for key and also of time only form dateTime attribute
@@ -164,9 +172,7 @@ Future<List<int>> getTask(Map<String,String> inputData) async {
     time = dateTime.substring(dateTime.indexOf(' '), dateTime.indexOf(' ') + 6),
     time = time.trim(),
 
-    print(row[2].toString() + "->" + dateTime.toString()),
-
-    // If this date does not point to a list (first row with this date), then set to new list
+    // If this date does not point to a list (first row with this date value), then set to new list of maps
     content[date] ??= new List<Map<String,String>>(),
 
     // Using this row's data, append a new map to the list
@@ -185,6 +191,7 @@ Future<List<int>> getTask(Map<String,String> inputData) async {
       }
     )
   });
+  
   // Encode the map into a json string
   String jsonContent = json.encode(content);
   // Encode the json string into utf8
@@ -203,22 +210,23 @@ Future<List<int>> getCategories(Map<String,String> inputData) async {
   Map<String,List<Map<String,String>>> content = new Map();
   // Have list of category names and ids the the user has as options that they own
   content["category_options"] ??= new List<Map<String,String>>();
+
+  // Add category id and name of each row to the list
   results.forEach((row) => {
-    content["category_options"].add(
-    {
+    content["category_options"].add({
       "id" : row[0].toString(),
       "name" : row[1].toString(),
     })
   });
 
   // Have list of colors available for creating categories
-    content["color_options"] ??= new List<Map<String,String>>();
+  content["color_options"] ??= new List<Map<String,String>>();
   query = "SELECT color FROM task_manager.color";
   results = await performQueryOnMySQL(query);
 
+  // Add color names to the list
   results.forEach((row) => {
-    content["color_options"].add(
-    {
+    content["color_options"].add({
       "option": row[0],
     })
   });
@@ -244,18 +252,20 @@ Future<String> attemptCreateUser(Map<String,String> inputData) async {
     query = "SELECT ID FROM task_manager.user WHERE username='$username' AND password='$password'";
     
     Results results = await performQueryOnMySQL(query); 
-    
+
+    // Return resulting ID value
     return results.first[0].toString();
   }
   catch (e) {
     print("ERROR $e");
     return null;
   }
-
 }
 
 // Method to handle deleting a task, given task id within inputData
 // Permission assumed granted
+// Input: task id for task being deleted
+// Output: task with matching id is deleted from the database
 void deleteTask(Map<String,String> inputData) {
   String query;
   String delete_id = inputData["task_id"];
@@ -264,6 +274,9 @@ void deleteTask(Map<String,String> inputData) {
   performQueryOnMySQL(query);
 }
 
+// Method for getting the ID of a user with just their username (assumed username is unique but not key), called by shareCategory()
+// Input: String of username being used to look up id
+// Output: If user exists with ID, returns the ID as a string
 Future<String> getUserIDfromUsername(String username) async {
   String query = "SELECT user.id FROM task_manager.user WHERE username='$username'";
   Results result = await performQueryOnMySQL(query);
@@ -271,10 +284,9 @@ Future<String> getUserIDfromUsername(String username) async {
   return result.first[0].toString();
 }
 
-
 // Method for sharing a category with another user
 // Assumes the client making this action is the valid owner of the category and that the categoryID is valid
-// Output: Assuming categoryID, client's ID, and the provided user ID to share with are valid, it is added to the share table
+// Output: Assuming categoryID, client's ID, and the provided user ID to share with are valid, it is inserted into the share table
 void shareCategory(Map<String,String> inputData) async {
   String query;
   // Get the values from the input data

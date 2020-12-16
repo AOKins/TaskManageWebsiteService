@@ -13,37 +13,40 @@ import 'databaseMethods.dart';
 void handleGet(HttpRequest request, bool loginThruPost) async {
   // Get the file being requested, then modify to access it the appriopriate resource locally
   String filePath = request.uri.toString();
+  // If logging in through the post, then set the verifiedS to "loggedIn" as validation 
   String verifiedS = loginThruPost ? "loggedIn" : "";
-  // Determine if they are logged in by checking the cookies
-  if (request.headers["Cookie"] != null && verifiedS != "") {
-    verifiedS = await verifyCookieAccess(request.headers["Cookie"] as List<String>);
+
+  // Determine if they are logged in by checking the cookies if they are not loggedIn through post
+  if (request.headers["Cookie"] != null && verifiedS == "") {
+    verifiedS = await verifyCookieAccess(request.headers["Cookie"]);
   }
+
   // If accessing the default directory, set to home page by default
   if (filePath == "/") {
-    if (verifiedS == "") {
-      filePath = "/login.html";
-    }
-    else {
       filePath = "/home.html";
-    }
   }
-  
-  // Append path to resources
-  filePath = "../resources" + filePath;
   // Get file format and add content-type header using MIME type
   String fileFormat = filePath.substring(filePath.lastIndexOf(".")+1);
 
+  // If couldn't determine a verification, then replace the resource being requested to login.html
+  if (verifiedS == "" && (filePath != "/signup.html" && filePath != "/login.html") && fileFormat == "html") {
+      filePath = "/login.html";
+  }
+  
+  // Append path to resources folder
+  filePath = "../resources" + filePath;
   request.response.headers.add("content-type", mimeTypesMap[fileFormat] ?? "application/octet-stream");
-  // Write response and close, ending conversation
+
+  // Get, write, and then close the response, ending conversation
   var bodyContent = fileContentsBytes(filePath);
 
-  // If the content is empty, then the resource is assumed not found (404 error code)
-  request.response.statusCode = (bodyContent != []) ? 200 : 404;
+  request.response.statusCode = (bodyContent != []) ? 200 : 404;  // If the content is empty, then the resource is assumed was not found (404 error code)
   request.response.add(bodyContent);
+
   request.response.close();
 }
 
-// Functiont to handle when the client is making a POST request (which atm is only when logging in)
+// Function to handle when the client is making a POST request (which atm is only when logging in)
 // Input: HttpRequest object to get and send with client
 // Output: If valid login, gives new valid cookie and then passes the request to handleGET
 void handlePost(HttpRequest request) async {
@@ -51,8 +54,10 @@ void handlePost(HttpRequest request) async {
   Map<String,String> bodyMap = convertBody(await utf8.decodeStream(request));
   bool loggedIn = false;
 
+  // Result stores the content for responding body
   List<int> result;
 
+  // If the POST method is logging in then the body content is login attempt info that needs to be handles
   if (bodyMap["submission"] == "login") {
     String verifyS = await verifyLoginCred(bodyMap["username"] as String, bodyMap["password"] as String);
     // Verify login
@@ -61,21 +66,27 @@ void handlePost(HttpRequest request) async {
       request.response.headers.add("Set-Cookie", verifyS);
       loggedIn = true;
     }
-    // Have handleGet perform the resulting body content for home.html
+    // Have handleGet perform the resulting body content for requested page
     return handleGet(request, loggedIn);
   }
+
+  // If the POST method is in a new user creating an account, need to determine if that's successful or not
   else if (bodyMap["submission"] == "createUser") {
+    // Attempt to create the user
     String id = await attemptCreateUser(bodyMap);
+
+    // If the id is not null then successs and set cookie to the newly created id
     if (id != null) {
       request.response.headers.add("Set-Cookie", id);
       result = utf8.encode("result=success");
     }
+    // If the id is null that means the user could not be created (duplicate username attempted to be created)
     else {
       result = utf8.encode("result=failure");
-    }
+    }  
   }
   else {
-    // If not logging in (currently no way to sign up), then they must have a cookie that identifies them so try and get it
+    // If not logging in or sign up, then they must have a cookie that identifies them so try and get it
     String userID_S;
     try {
       userID_S = await verifyCookieAccess(request.headers["Cookie"] as List<String>);
@@ -85,7 +96,8 @@ void handlePost(HttpRequest request) async {
       request.response.close();
       return;
     }
-    // Add the id to the map
+    print("cookie: " + userID_S);
+      // Add the id to the map
     bodyMap["user_id"] = userID_S;
     // Determine if verified or not by checking the string before checking submission 
     if (userID_S != "") {
@@ -112,10 +124,11 @@ void handlePost(HttpRequest request) async {
         case "shareCategory" : {
           shareCategory(bodyMap);
         } break;
-
       }
     }
   }
+  // If results has content, then be sure to return it to the client before closing the connection
+  
   // Set mime type to json for results, if the map is null (not defined) default to application/octet-stream
   request.response.headers.add("content-type", mimeTypesMap["json"] ?? "application/octet-stream");
   // If result is null than add an empty list

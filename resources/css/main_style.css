@@ -56,6 +56,12 @@ nav ul li a:hover {
 }
 /* End of Nav Bar */
 
+form {
+    text-align: left;
+    padding: 20px;
+    background-color: rgba(100,100,100, 0.8);
+}
+
 /*Style for create task form*/
 #createForm {
     position: fixed;
@@ -65,11 +71,7 @@ nav ul li a:hover {
     z-index: 20;
 }
 
-form {
-    text-align: left;
-    padding: 20px;
-    background-color: rgba(100,100,100, 0.8);
-}
+
 #createForm form#createTask input {
     margin-top: 10px;
     margin-bottom: 10px;

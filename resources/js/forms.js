@@ -1,10 +1,9 @@
-// Javascript file to hold behavior related to the create Task form
-
-// Node for createTask form identified by id "createTask"
-var createForm = document.getElementById("createTask");
+// Javascript file to hold behavior related to the create Task form and share Category form
 
 // Node for the entire form object idenified 
 var createFormObj = document.getElementById("createForm");
+// Node for createTask form specifically identified by id "createTask"
+var createForm = document.getElementById("createTask");
 
 if (createFormObj != null && createForm != null) {
     // Node for show button that toggles the display of the form or not
@@ -13,7 +12,7 @@ if (createFormObj != null && createForm != null) {
     // True when the form should be visible the client, initially false (not showing)
     var showCreate = false;
 
-    // Define the behavior for the show button    
+    // Add event listener for the show button of the form to adjust the height of the entire create form object when clicked
     showButtonNode.addEventListener("click", function() {
         if (!showCreate) {
             // Hide the form object by moving it outside of visible range
@@ -27,7 +26,6 @@ if (createFormObj != null && createForm != null) {
         showCreate = !showCreate;
     });
 
-    // Add event listener for the show button of the form to adjust the height when clicked
     // Add an event listener for when submit is activated and perform the POST request when it happens 
     createForm.addEventListener("submit", async function(event) {
         // Preventing default reload request/expectation
@@ -39,7 +37,7 @@ if (createFormObj != null && createForm != null) {
         var i, s_content;
         // Make sure to initialize s_content to empty string before adding anything
         s_content = "";
-        var dateSubmit, date, time;
+        var date, time;
         for (i = 0; i < createForm.length-1; i++) {
             // Add this input field's content, using id to identify the variable being set
             if (createForm[i].id == "due_date") {
@@ -57,10 +55,10 @@ if (createFormObj != null && createForm != null) {
             }
         }
 
-        
+        // Append the date and time as a single value
+        // Currently just sends the submitted time with no conversion from local to UTC/other timezone
         s_content += "dateTime=" + date + " " + time;
 
-        console.log(s_content);
         // Send the new task to the server as a POST request with submission value set to createTask so it is identifiable as this kind of request
         var myRequest = new XMLHttpRequest();
         myRequest.open("POST", "/", true);
@@ -68,7 +66,7 @@ if (createFormObj != null && createForm != null) {
         myRequest.send("submission=createTask&" + s_content);
         // Call loadContent() (assumed to be in another javascript file for the respective page this is attached to)
         loadContent();
-        getCategories(); // Refresh categories as well
+        getCategories(); // Refresh categories as well in case new category was made
     });
 }
 
@@ -145,7 +143,8 @@ if (categoryInputCreate != null) {
     });
 }
 
-// Function for adding categories into categoryInput tag for create Task form
+// Function for adding categories into categoryInput tag for create Task form and share Category form
+// Input is expected json content that cocntains the category and color info required
 function appendingCategories(content) {
     // Convert content to json format
     var jsonContent = JSON.parse(content);
@@ -165,15 +164,18 @@ function appendingCategories(content) {
     for (i in jsonContent.category_options) {
         categoryOption = document.createElement("OPTION");
         categoryOption.setAttribute("value", jsonContent.category_options[jsonContent.category_options.length-1 - i].id); // The value is the category's associated ID
+
         categoryOption.innerHTML = jsonContent.category_options[jsonContent.category_options.length-1 - i].name;
         categoryInputCreate.appendChild(categoryOption);
         // Apeend not just to create form, but also to the share form's create slect list
         shareOption = document.createElement("OPTION");
         shareOption.setAttribute("value", jsonContent.category_options[jsonContent.category_options.length-1 - i].id); // The value is the category's associated ID
+
         shareOption.innerHTML = jsonContent.category_options[jsonContent.category_options.length-1 - i].name;
         categoryInputShare.appendChild(shareOption);
     }
-    // Setting the available colors according to what the response contains
+
+    // Setting the available colors according to what the response contains for color_options list
     for (i in jsonContent.color_options) {
         colorOption = document.createElement("OPTION");
         colorOption.setAttribute("value", jsonContent.color_options[i].option);
