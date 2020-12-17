@@ -154,9 +154,9 @@ Future<List<int>> getTask(Map<String,String> inputData) async {
   String query = "";
   // Generating the query to get all tasks for a user in given time range, includes shared tasks and category info
   query += "SELECT task.ID, task.title, task.description, task.dateTime, task.completion, viewCategories.name, viewCategories.color, user.username as ownerName, task.ownerID ";
-  query += "FROM (SELECT DISTINCT category.ID, category.ownerID as ownerID, category.name, category.color ";
-	query += "FROM category, share WHERE category.ownerID = $user_id OR (share.userID = $user_id AND share.categoryID = category.ID)) as viewCategories, task, user ";
-	query += "WHERE user.ID = task.ownerID AND viewCategories.ID = task.categoryID AND task.dateTime <= '$endRange' AND task.dateTime >= '$startRange' ORDER BY task.dateTime;";
+  query += "FROM (SELECT DISTINCT category.ID, category.ownerID as CategoryOwnerID, category.name, category.color FROM category LEFT OUTER JOIN share ON share.categoryID = category.ID ";
+	query += "WHERE category.ownerID = $user_id OR (share.userID = $user_id AND share.categoryID = category.ID)) as viewCategories INNER JOIN task ON task.categoryID = viewCategories.ID, user ";
+	query += "WHERE (task.categoryID = viewCategories.ID OR task.ownerID = $user_id) and user.ID = viewCategories.CategoryOwnerID AND task.dateTime >= '$startRange' AND task.dateTime <= '$endRange';";
   // Create a map to a list of Maps, use date as key to list of task info in the form of maps
   Map<String, List< Map<String,String>>> content = new Map();
   Results results = await performQueryOnMySQL(query);
@@ -174,7 +174,6 @@ Future<List<int>> getTask(Map<String,String> inputData) async {
 
     // If this date does not point to a list (first row with this date value), then set to new list of maps
     content[date] ??= new List<Map<String,String>>(),
-
     // Using this row's data, append a new map to the list
     content[date].add(
       {
